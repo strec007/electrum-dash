@@ -7,10 +7,10 @@ ROOT_FOLDER="$CONTRIB_ANDROID"/../..
 PACKAGES="$ROOT_FOLDER"/packages/
 LOCALE="$ROOT_FOLDER"/electrum_dash/locale/
 
-if [ ! -d "$LOCALE" ]; then
-  echo "Run make_locale first!"
-  exit 1
-fi
+#if [ ! -d "$LOCALE" ]; then
+#  echo "Run make_locale first!"
+#  exit 1
+#fi
 
 if [ ! -d "$PACKAGES" ]; then
   echo "Run make_packages first!"

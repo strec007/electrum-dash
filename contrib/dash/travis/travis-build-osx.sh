@@ -35,7 +35,7 @@ $PIP_CMD install --no-dependencies --no-warn-script-location -I \
     -r contrib/deterministic-build/requirements-build-mac.txt
 
 export PATH="/usr/local/opt/gettext/bin:$PATH"
-./contrib/make_locale
+#./contrib/make_locale
 find . -name '*.po' -delete
 find . -name '*.pot' -delete
 
