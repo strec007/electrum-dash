@@ -3,8 +3,8 @@
 set -ev
 
 export PYINSTALLER_REPO="https://github.com/pyinstaller/pyinstaller.git"
-export PYINSTALLER_COMMIT="7acfd674ec49504cbc0e54ffbccb0fea64a33ff7"
-# Try using latest...
+export PYINSTALLER_COMMIT="669313ba4c5c1403ebeb335c35cb68c8c6ba5dd4"
+# Try using 4.1..
 
 if [ "$WINEARCH" = "win32" ] ; then
     export PYINST_ARCH="32bit"
