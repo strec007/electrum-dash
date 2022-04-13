@@ -15,7 +15,6 @@ export host_strip="${GCC_TRIPLET_HOST}-strip"
 
 ./contrib/build-wine/build_secp256k1.sh
 ./contrib/build-wine/build_x11_hash.sh
-./contrib/build-wine/build_pyinstaller.sh
 
 mv $BUILD_DIR/zbarw $WINEPREFIX/drive_c/
 
@@ -28,8 +27,8 @@ cp contrib/build-wine/deterministic.spec .
 cp contrib/dash/pyi_runtimehook.py .
 cp contrib/dash/pyi_tctl_runtimehook.py .
 
-wine python -m pip install --no-warn-script-location dist/pyinstaller/
-rm -rf dist/pyinstaller/
+#wine python -m pip install --no-warn-script-location dist/pyinstaller/
+#rm -rf dist/pyinstaller/
 
 wine python -m pip install --no-dependencies --no-warn-script-location \
     -r contrib/deterministic-build/requirements.txt
