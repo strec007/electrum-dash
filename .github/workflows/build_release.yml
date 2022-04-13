@@ -1,6 +1,9 @@
 name: Build release workflow
 
-on: [workflow_dispatch]
+on:
+  push:
+    tags:
+    - '*'
 
 jobs:
 
