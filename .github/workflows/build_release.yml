@@ -45,7 +45,7 @@ jobs:
         id: set_vars
         run: |
           source ./contrib/dash/travis/electrum_dash_version_env.sh
-          echo "::set-output name=pkg_ver::4.1.5.3"
+          echo "::set-output name=pkg_ver::$(echo $DASH_ELECTRUM_VERSION)"
       - name: Prepare build
         env:
           DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
