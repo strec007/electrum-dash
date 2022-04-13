@@ -9,8 +9,8 @@ Dash Electrum - Lightweight Dashpay client
   Homepage: https://electrum.dash.org/
 
 
-.. image:: https://travis-ci.org/akhavr/electrum-dash.svg?branch=master
-    :target: https://travis-ci.org/akhavr/electrum-dash
+.. image:: https://travis-ci.org/ktechmidas/electrum-dash.svg?branch=master
+    :target: https://travis-ci.org/ktechmidas/electrum-dash
     :alt: Build Status
 
 
@@ -26,7 +26,7 @@ Use PPA setup
 
 On Ubuntu/Linux Mint you can try to install Dash Electrum with next commands::
 
-    sudo add-apt-repository ppa:akhavr/dash-electrum
+    sudo add-apt-repository ppa:ktechmidas/dash-electrum
     sudo apt-get update
     sudo apt-get install dash-electrum
 
@@ -94,7 +94,7 @@ Development version
 
 Check out the code from GitHub::
 
-    git clone https://github.com/akhavr/electrum-dash.git
+    git clone https://github.com/ktechmidas/electrum-dash.git
     cd electrum-dash
 
 Run install (this should install dependencies)::

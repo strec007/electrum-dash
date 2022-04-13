@@ -68,7 +68,7 @@
   <project_license>MIT</project_license>
   <url type="homepage">https://electrum.dash.org</url>
   <url type="bugtracker">
-    https://github.com/akhavr/electrum-dash/issues
+    https://github.com/ktechmidas/electrum-dash/issues
   </url>
   <url type="help">
     https://docs.dash.org/en/stable/wallets/index.html#dash-electrum-wallet
@@ -110,7 +110,7 @@
     </release>
   </releases>
   <update_contact>
-    https://github.com/akhavr/electrum-dash/issues
+    https://github.com/ktechmidas/electrum-dash/issues
   </update_contact>
   <url type="translate">https://www.transifex.com/dash/dash-electrum</url>
 </component>

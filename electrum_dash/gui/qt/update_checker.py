@@ -19,8 +19,8 @@ from electrum_dash.network import Network
 
 
 class UpdateCheck(QDialog, Logger):
-    url = "https://raw.githubusercontent.com/akhavr/electrum-dash/master/.latest-version"
-    download_url = "https://github.com/akhavr/electrum-dash/releases"
+    url = "https://raw.githubusercontent.com/ktechmidas/electrum-dash/master/.latest-version"
+    download_url = "https://github.com/ktechmidas/electrum-dash/releases"
 
 
     VERSION_ANNOUNCEMENT_SIGNING_KEYS = (

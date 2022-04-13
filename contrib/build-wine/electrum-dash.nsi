@@ -11,7 +11,7 @@
   !define PRODUCT_NAME_NO_SPACE "Dash-Electrum"
   !define PREV_PROD_NAME "Electrum-DASH"
   !define PREV_PROD_NAME2 "Dash-Electrum"
-  !define PRODUCT_WEB_SITE "https://github.com/akhavr/electrum-dash"
+  !define PRODUCT_WEB_SITE "https://github.com/ktechmidas/electrum-dash"
   !define PRODUCT_PUBLISHER "Electrum Technologies GmbH"
   !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
   !define PREV_PROD_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PREV_PROD_NAME}"

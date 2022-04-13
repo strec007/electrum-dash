@@ -239,7 +239,7 @@ _INSTANCE = None
 TOR_WARN_MSG = _('Warning: Tor proxy is not detected, to enable'
                  ' it read the docs:')
 TOR_DOCS_TITLE = _('Tor Setup Docs')
-TOR_DOCS_URI = ('https://github.com/akhavr/electrum-dash/'
+TOR_DOCS_URI = ('https://github.com/ktechmidas/electrum-dash/'
                 'blob/master/docs/tor.md')
 TOR_DOCS_URI_QT = f'<br><a href="{TOR_DOCS_URI}">{TOR_DOCS_TITLE}</a>'
 TOR_DOCS_URI_KIVY = (f'\n\n[color=#00f][ref={TOR_DOCS_URI}]'
