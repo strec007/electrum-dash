@@ -2,9 +2,9 @@
 
 set -ev
 
-export PYINSTALLER_REPO="https://github.com/SomberNight/pyinstaller.git"
-export PYINSTALLER_COMMIT="80ee4d613ecf75a1226b960a560ee01459e65ddb"
-# ^ tag 4.2, plus a custom commit that fixes cross-compilation with MinGW
+export PYINSTALLER_REPO="https://github.com/pyinstaller/pyinstaller.git"
+export PYINSTALLER_COMMIT="7acfd674ec49504cbc0e54ffbccb0fea64a33ff7"
+# Try using latest...
 
 if [ "$WINEARCH" = "win32" ] ; then
     export PYINST_ARCH="32bit"
