@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
 
-#./contrib/make_locale
+./contrib/make_locale
 find . -name '*.po' -delete
 find . -name '*.pot' -delete
 

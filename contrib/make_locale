@@ -8,7 +8,8 @@ os.chdir(os.path.join('..', 'electrum_dash'))
 
 # Get fresh translations
 clonetmp = tempfile.mkdtemp()
-os.system("git clone https://github.com/zebra-lucky/electrum-dash-locale")
+os.system("git clone https://github.com/akhavr/electrum-dash-locale")
+os.system("mv electrum-dash-locale/locale .")
 
 # Convert .po to .mo
 print('Installing')
