@@ -84,7 +84,7 @@ deploy:
   file:
   - build/electrum-dash/dist/Dash-Electrum-$DASH_ELECTRUM_VERSION-macosx.dmg
   on:
-    repo: Bertrand256/electrum-dash
+    repo: ktechmidas/electrum-dash
     tags: true
     condition: "$TRAVIS_OS_NAME = osx"
 - provider: releases
@@ -100,7 +100,7 @@ deploy:
   - build/electrum-dash/bin/Electrum_DASH-$DASH_ELECTRUM_APK_VERSION-$APP_ANDROID_ARCH-release-unsigned.apk
   - build/electrum-dash/bin/Electrum_DASH_Testnet-$DASH_ELECTRUM_APK_VERSION-$APP_ANDROID_ARCH-release-unsigned.apk
   on:
-    repo: Bertrand256/electrum-dash
+    repo: ktechmidas/electrum-dash
     tags: true
     condition: "$TRAVIS_OS_NAME = linux"
 notifications:
