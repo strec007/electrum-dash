@@ -102,10 +102,10 @@ jobs:
         id: set_vars
         run: |
           source ./contrib/dash/travis/electrum_dash_version_env.sh
-          echo "::set-output name=pkg_ver::$(echo $DASH_ELECTRUM_VERSION)"
-          echo "::set-output name=apk_ver::$(echo $DASH_ELECTRUM_APK_VERSION)"
-          echo "::set-output name=vercode::$(echo $DASH_ELECTRUM_VERSION_CODE)"
-          echo "::set-output name=is_release::$(echo $IS_RELEASE)"
+          echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
+          echo "apk_ver=$(echo $DASH_ELECTRUM_APK_VERSION)" >> $GITHUB_OUTPUT
+          echo "vercode=$(echo $DASH_ELECTRUM_VERSION_CODE)" >> $GITHUB_OUTPUT
+          echo "is_release=$(echo $IS_RELEASE)" >> $GITHUB_OUTPUT
       - name: Prepare build
         if: ${{ steps.set_vars.outputs.is_release || matrix.is_mainnet[0] == 'false' }}
         env:
@@ -126,7 +126,7 @@ jobs:
           ./contrib/dash/actions/script-linux-apk.sh
       - name: Upload Release Asset
         if: ${{ steps.set_vars.outputs.is_release || matrix.is_mainnet[0] == 'false' }}
-        uses: actions/upload-release-asset@v1
+        uses: Bertrand256/upload-release-asset@v1.0.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
