@@ -48,6 +48,7 @@ jobs:
   build_osx:
     needs: create_release
     runs-on: macos-10.15
+    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'osx' }}
     name: create release for macOS
     steps:
       - name: Checkout
@@ -56,7 +57,7 @@ jobs:
         id: set_vars
         run: |
           source ./contrib/dash/travis/electrum_dash_version_env.sh
-          echo "::set-output name=pkg_ver::$(echo $DASH_ELECTRUM_VERSION)"
+          echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
           DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
@@ -68,7 +69,7 @@ jobs:
         run: |
           ./contrib/dash/actions/script-osx.sh
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: Bertrand256/upload-release-asset@v1.0.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
