@@ -21,7 +21,7 @@ docker run --rm \
 
 BUILD_DIR=/root/build
 TOR_PROXY_VERSION=0.4.5.7
-TOR_PROXY_PATH=https://github.com/zebra-lucky/tor-proxy/releases/download
+TOR_PROXY_PATH=https://github.com/Bertrand256/tor-proxy/releases/download
 TOR_DIST=dist/tor-proxy-setup.exe
 
 TOR_FILE=${TOR_PROXY_VERSION}/tor-proxy-${TOR_PROXY_VERSION}-win32-setup.exe
@@ -36,7 +36,7 @@ export WINEPREFIX=/root/.wine-32
 export PYHOME=$WINEPREFIX/drive_c/Python38
 
 
-ZBARW_PATH=https://github.com/zebra-lucky/zbarw/releases/download/20180620
+ZBARW_PATH=https://github.com/Bertrand256/zbarw/releases/download/20180620
 ZBARW_FILE=zbarw-zbarcam-0.10-win32.zip
 ZBARW_SHA=eed1af99d68a1f9eab975843071bf088735cb79bf3188d511d06a3f1b4e10243
 wget ${ZBARW_PATH}/${ZBARW_FILE}

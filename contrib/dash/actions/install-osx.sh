@@ -28,7 +28,7 @@ popd
 sudo rm -rf libusb-${LIBUSB_VER}*
 cp /opt/libusb/lib/libusb-1.*.dylib .
 
-LSECP256K1_PATH=https://github.com/zebra-lucky/secp256k1/
+LSECP256K1_PATH=https://github.com/Bertrand256/secp256k1/
 LSECP256K1_PATH=${LSECP256K1_PATH}releases/download/210521
 LSECP256K1_FILE=libsecp256k1-210521-osx.tgz
 LIB_SHA256=51c861bfb894ec520cc1ee0225fae00447aa86096782a1acd1fc6e338a576ea7

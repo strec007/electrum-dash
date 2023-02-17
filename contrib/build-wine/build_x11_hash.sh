@@ -2,7 +2,7 @@
 
 set -ev
 
-export X11_HASH_REPO="https://github.com/zebra-lucky/x11_hash.git"
+export X11_HASH_REPO="https://github.com/Bertrand256/x11_hash.git"
 export X11_HASH_COMMIT="ecdf417847601ae74a3ed1a2b787c80a22264a3d"
 
 echo "Building x11_hash for $WINEARCH."

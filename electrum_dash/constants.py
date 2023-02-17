@@ -57,7 +57,7 @@ def read_json_gz(filename, default):
     return r
 
 
-GIT_REPO_URL = "https://github.com/ktechmidas/electrum-dash"
+GIT_REPO_URL = "https://github.com/Bertrand256/electrum-dash"
 GIT_REPO_ISSUES_URL = f"{GIT_REPO_URL}/issues"
 BIP39_WALLET_FORMATS = read_json('bip39_wallet_formats.json', [])
 

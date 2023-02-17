@@ -26,7 +26,7 @@ Use PPA setup
 
 On Ubuntu/Linux Mint you can try to install Dash Electrum with next commands::
 
-    sudo add-apt-repository ppa:Bertrand256/dash-electrum
+    sudo add-apt-repository ppa:ktechmidas/dash-electrum
     sudo apt-get update
     sudo apt-get install dash-electrum
 
