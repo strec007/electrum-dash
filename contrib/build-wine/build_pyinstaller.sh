@@ -4,7 +4,7 @@ set -ev
 
 export PYINSTALLER_REPO="https://github.com/pyinstaller/pyinstaller.git"
 export PYINSTALLER_COMMIT="669313ba4c5c1403ebeb335c35cb68c8c6ba5dd4"
-# Try using 4.1..
+# ^ tag 4.10
 
 if [ "$WINEARCH" = "win32" ] ; then
     export PYINST_ARCH="32bit"
