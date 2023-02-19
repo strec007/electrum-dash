@@ -13,7 +13,8 @@ on:
           type: choice
           options:
             - all
-            - windows_linux
+            - linux
+            - windows
             - osx
             - android
 jobs:
@@ -135,11 +136,11 @@ jobs:
           asset_name: ${{ matrix.is_mainnet[1] }}-${{ steps.set_vars.outputs.apk_ver }}-${{ matrix.arch }}-release-unsigned.apk
           asset_content_type: application/vnd.android.package-archive
 
-  build_linux_win:
+  build_linux:
     needs: create_release
     runs-on: ubuntu-18.04
-    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'windows_linux' }}
-    name: create release for Linux/Win
+    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'linux' }}
+    name: create release for Linux
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -153,7 +154,7 @@ jobs:
           DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
         run: |
           ./contrib/dash/actions/install-linux.sh
-      - name: Build Linux/Win
+      - name: Build Linux
         env:
           DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
         run: |
@@ -185,6 +186,30 @@ jobs:
           asset_path: dist/Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-x86_64.AppImage
           asset_name: Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-x86_64.AppImage
           asset_content_type: application/octet-stream
+
+  build_windows:
+    needs: create_release
+    runs-on: ubuntu-18.04
+    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'windows' }}
+    name: create release for Windows
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set outputs for pkg_ver
+        id: set_vars
+        run: |
+          source ./contrib/dash/travis/electrum_dash_version_env.sh
+          echo "::set-output name=pkg_ver::$(echo $DASH_ELECTRUM_VERSION)"
+      - name: Prepare build
+        env:
+          DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
+        run: |
+          ./contrib/dash/actions/install-wine.sh
+      - name: Build Windows
+        env:
+          DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
+        run: |
+          ./contrib/dash/actions/script-wine.sh
       - name: Upload Win32 Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -203,13 +228,3 @@ jobs:
           asset_path: dist/Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
           asset_name: Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
           asset_content_type: application/vnd.microsoft.portable-executable
-
-#  upload_notify_artifact:
-#    runs-on: ubuntu-18.04
-#    if: always()
-#    name: Upload Notify Artifact
-#    steps:
-#      - name: Upload Notify Artifact
-#        uses: zebra-lucky/actions-js-slackJobsStatus@0.0.2
-#        with:
-#          gh_ctx: ${{ toJson(github) }}
