@@ -20,7 +20,7 @@ on:
 jobs:
 
   create_release:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     name: Create github release
     outputs:
       upload_url: >
@@ -48,7 +48,7 @@ jobs:
 
   build_osx:
     needs: create_release
-    runs-on: macos-10.15
+    runs-on: macos-11
     if: ${{ inputs.target_os == 'all' || inputs.target_os == 'osx' }}
     name: create release for macOS
     steps:
@@ -70,7 +70,7 @@ jobs:
         run: |
           ./contrib/dash/actions/script-osx.sh
       - name: Upload Release Asset
-        uses: Bertrand256/upload-release-asset@v1.0.3
+        uses: Bertrand256/upload-release-asset@v1.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -81,7 +81,7 @@ jobs:
 
   build_apk:
     needs: create_release
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     if: ${{ inputs.target_os == 'all' || inputs.target_os == 'android' }}
     strategy:
       matrix:
@@ -127,7 +127,7 @@ jobs:
           ./contrib/dash/actions/script-linux-apk.sh
       - name: Upload Release Asset
         if: ${{ steps.set_vars.outputs.is_release || matrix.is_mainnet[0] == 'false' }}
-        uses: Bertrand256/upload-release-asset@v1.0.3
+        uses: Bertrand256/upload-release-asset@v1.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -138,7 +138,7 @@ jobs:
 
   build_linux:
     needs: create_release
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     if: ${{ inputs.target_os == 'all' || inputs.target_os == 'linux' }}
     name: create release for Linux
     steps:
@@ -148,7 +148,7 @@ jobs:
         id: set_vars
         run: |
           source ./contrib/dash/travis/electrum_dash_version_env.sh
-          echo "::set-output name=pkg_ver::$(echo $DASH_ELECTRUM_VERSION)"
+          echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
           DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
@@ -160,7 +160,7 @@ jobs:
         run: |
           ./contrib/dash/actions/script-linux.sh
       - name: Upload sdist tar.gz Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: Bertrand256/upload-release-asset@v1.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -169,7 +169,7 @@ jobs:
           asset_name: Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.tar.gz
           asset_content_type: application/gzip
       - name: Upload sdist zip Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: Bertrand256/upload-release-asset@v1.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -178,7 +178,7 @@ jobs:
           asset_name: Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}.zip
           asset_content_type: application/x-zip-compressed
       - name: Upload AppImage Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: Bertrand256/upload-release-asset@v1.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -189,7 +189,7 @@ jobs:
 
   build_windows:
     needs: create_release
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     if: ${{ inputs.target_os == 'all' || inputs.target_os == 'windows' }}
     name: create release for Windows
     steps:
@@ -199,7 +199,7 @@ jobs:
         id: set_vars
         run: |
           source ./contrib/dash/travis/electrum_dash_version_env.sh
-          echo "::set-output name=pkg_ver::$(echo $DASH_ELECTRUM_VERSION)"
+          echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
           DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
@@ -211,7 +211,7 @@ jobs:
         run: |
           ./contrib/dash/actions/script-wine.sh
       - name: Upload Win32 Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: Bertrand256/upload-release-asset@v1.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -220,7 +220,7 @@ jobs:
           asset_name: Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win32.exe
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Win64 Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: Bertrand256/upload-release-asset@v1.0.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
