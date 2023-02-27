@@ -12,9 +12,6 @@ docker run --rm \
     -t $DOCKER_IMG_BUILD_SDIST \
     /opt/contrib/build-linux/sdist/build.sh
 
-sudo find . -name '*.po' -delete
-sudo find . -name '*.pot' -delete
-
 docker run --rm \
     -v $(pwd):/opt \
     -w /opt/contrib/build-linux/appimage \

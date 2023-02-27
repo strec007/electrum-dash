@@ -9,6 +9,9 @@ os.chdir(os.path.join('..', 'electrum_dash'))
 clonetmp = tempfile.mkdtemp()
 if os.path.exists("electrum-dash-locale"):
     os.system("rm -Rf electrum-dash-locale")
+if os.path.exists("locale"):
+    os.system("rm -Rf locale")
+
 # Get fresh translations
 os.system("git clone https://github.com/Bertrand256/electrum-dash-locale")
 os.system("mv electrum-dash-locale/locale .")
