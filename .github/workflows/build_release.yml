@@ -12,11 +12,11 @@ on:
           required: true
           type: choice
           options:
-            - all
-            - linux
-            - windows
-            - osx
-            - android
+            - All
+            - Linux
+            - Windows
+            - macOS
+            - Android
 jobs:
 
   create_release:
@@ -49,7 +49,7 @@ jobs:
   build_osx:
     needs: create_release
     runs-on: macos-11
-    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'osx' }}
+    if: ${{ inputs.target_os == 'All' || inputs.target_os == 'macOS' }}
     name: create release for macOS
     steps:
       - name: Checkout
@@ -81,7 +81,7 @@ jobs:
   build_apk:
     needs: create_release
     runs-on: ubuntu-22.04
-    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'android' }}
+    if: ${{ inputs.target_os == 'All' || inputs.target_os == 'Android' }}
     strategy:
       matrix:
         arch: ['armeabi-v7a', 'arm64-v8a']
@@ -137,7 +137,7 @@ jobs:
   build_linux:
     needs: create_release
     runs-on: ubuntu-22.04
-    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'linux' }}
+    if: ${{ inputs.target_os == 'All' || inputs.target_os == 'Linux' }}
     name: create release for Linux
     steps:
       - name: Checkout
@@ -185,7 +185,7 @@ jobs:
   build_windows:
     needs: create_release
     runs-on: ubuntu-22.04
-    if: ${{ inputs.target_os == 'all' || inputs.target_os == 'windows' }}
+    if: ${{ inputs.target_os == 'All' || inputs.target_os == 'Windows' }}
     name: create release for Windows
     steps:
       - name: Checkout
