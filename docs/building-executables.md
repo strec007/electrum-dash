@@ -268,12 +268,13 @@ Is CN=John Doe, OU=Dev department, O=Dash Electrum Builders, L=London, ST=Unknow
 Unless you're going to publish the app on the Google Play Store, the information you enter doesn't really matter.
 
 ##### 3.2 Sign the executable files
-From your commandline terminal, execute the following commands (changing *dash_electrum.keystore* to an appropriate value):
+From your commandline terminal, execute the following commands, changing *dash_electrum.keystore*, *Dash-Electrum* and 
+*X.X.X.X* to appropriate values (keystore file name, app version and key name, respectively):
 ```
-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore dash_electrum.keystore dist/Electrum_DASH-4.1.6.6-arm64-v8a-release-unsigned.apk Dash-Electrum
-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore dash_electrum.keystore dist/Electrum_DASH-4.1.6.6-armeabi-v7a-release-unsigned.apk Dash-Electrum
-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore dash_electrum.keystore dist/Electrum_DASH_Testnet-4.1.6.6-arm64-v8a-release-unsigned.apk Dash-Electrum
-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore dash_electrum.keystore dist/Electrum_DASH_Testnet-4.1.6.6-armeabi-v7a-release-unsigned.apk Dash-Electrum
+jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore dash_electrum.keystore dist/Electrum_DASH-X.X.X.X-arm64-v8a-release-unsigned.apk Dash-Electrum
+jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore dash_electrum.keystore dist/Electrum_DASH-X.X.X.X-armeabi-v7a-release-unsigned.apk Dash-Electrum
+jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore dash_electrum.keystore dist/Electrum_DASH_Testnet-X.X.X.X-arm64-v8a-release-unsigned.apk Dash-Electrum
+jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore dash_electrum.keystore dist/Electrum_DASH_Testnet-X.X.X.X-armeabi-v7a-release-unsigned.apk Dash-Electrum
 ```
 
 And finally, rename the file names to reflect the fact that they are no longer unsigned:
