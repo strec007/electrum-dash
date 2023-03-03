@@ -89,6 +89,12 @@ To use Tor Proxy on Ubuntu set it up with::
 
 Other platforms setup is described at `docs/tor.md <docs/tor.md>`_
 
+Building Dash Electrum executables
+===================
+
+This topic is described here: `docs/building-executables.md <docs/building-executables.md>`_
+
+
 Development version
 ===================
 
