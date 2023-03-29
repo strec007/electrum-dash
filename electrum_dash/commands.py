@@ -1207,6 +1207,7 @@ def get_parser():
     parser_gui.add_argument("-m", action="store_true", dest="hide_gui", default=False, help="hide GUI on startup")
     parser_gui.add_argument("-L", "--lang", dest="language", default=None, help="default language used in GUI")
     parser_gui.add_argument("--daemon", action="store_true", dest="daemon", default=False, help="keep daemon running after GUI is closed")
+    parser_gui.add_argument("--ukraine-info", action="store_true", dest="ukraine_info", default=False, help="show 'Ukraine banner' on startup")
     add_wallet_option(parser_gui)
     add_network_options(parser_gui)
     add_global_options(parser_gui)

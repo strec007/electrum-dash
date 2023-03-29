@@ -28,6 +28,7 @@ import signal
 import sys
 import traceback
 import threading
+import re
 from typing import Optional, TYPE_CHECKING, List
 
 
@@ -74,8 +75,10 @@ class OpenFileEventFilter(QObject):
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.FileOpen:
             if len(self.windows) >= 1:
-                self.windows[0].pay_to_URI(event.url().toString())
-                return True
+                url = event.url().toString()
+                if not re.match('^file://.*pydevd.py$', url):
+                    self.windows[0].pay_to_URI(url)
+                    return True
         return False
 
 
@@ -277,7 +280,8 @@ class ElectrumGui(Logger):
         w = ElectrumWindow(self, wallet)
         self.windows.append(w)
         self.build_tray_menu()
-        w.ukraine_info()
+        if self.config.ukraine_info:
+            w.ukraine_info()
         w.warn_if_testnet()
         w.warn_if_watching_only()
         return w

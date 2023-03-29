@@ -109,6 +109,8 @@ class SimpleConfig(Logger):
             self.decimal_point = DECIMAL_POINT_DEFAULT
         self.num_zeros = int(self.get('num_zeros', 8))
 
+        self.ukraine_info = self.get('ukraine_info', False) # change the 'Ukraine info' banner to opt-in
+
     def electrum_path(self):
         # Read electrum_path from command line
         # Otherwise use the user's default data directory.

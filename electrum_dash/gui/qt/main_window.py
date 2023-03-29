@@ -702,7 +702,10 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
             self.setGeometry(100, 100, 840, 400)
 
     def watching_only_changed(self):
-        name = "Dash Electrum | Glory to Ukraine | Slava Ukraini! | "
+        if not self.config.ukraine_info:
+            name = "Dash Electrum"
+        else:
+            name = "Dash Electrum | Glory to Ukraine | Slava Ukraini! | "
         if constants.net.TESTNET:
             name += " " + constants.net.NET_NAME.capitalize()
         title = '%s %s  -  %s' % (name, ELECTRUM_VERSION,
@@ -954,7 +957,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, Logger):
         run_hook('init_menubar_tools', self, tools_menu)
 
         help_menu = menubar.addMenu(_("&Help"))
-        help_menu.addAction('Help Ukraine', self.ukraine_info)
+        if self.config.ukraine_info:
+            help_menu.addAction('Help Ukraine', self.ukraine_info)
         help_menu.addAction(_("&About"), self.show_about)
         help_menu.addAction(_("&Check for updates"), self.show_update_check)
         help_menu.addAction(_("&Official website"), lambda: webopen("https://electrum.dash.org"))
