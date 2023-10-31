@@ -17,8 +17,16 @@ on:
             - Windows
             - macOS
             - Android
-jobs:
+      prerelease:
+        description: "True to set 'Pre-Release' option"
+        required: true
+        type: boolean
+      draft:
+        description: "True to set 'Draft' option"
+        required: true
+        type: boolean
 
+jobs:
   create_release:
     runs-on: ubuntu-22.04
     name: Create github release
@@ -43,8 +51,8 @@ jobs:
         with:
           tag_name: ${{ inputs.tag }}
           release_name: ${{ inputs.tag }}
-          draft: false
-          prerelease: false
+          draft: ${{ inputs.draft }}
+          prerelease: ${{ inputs.prerelease }}
 
   build_osx:
     needs: create_release
