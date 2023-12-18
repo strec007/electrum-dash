@@ -6,7 +6,7 @@ aiohttp_socks>=0.3
 certifi
 bitstring
 attrs>=19.2.0
-x11_hash==1.4
+dash_hash==1.5.0
 python-bls>=0.1.8
 Pygments>=2.1
 
