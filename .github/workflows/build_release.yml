@@ -48,7 +48,7 @@ jobs:
 
   build_osx:
     needs: create_release
-    runs-on: macos-11
+    runs-on: macos-14
     if: ${{ inputs.target_os == 'All' || inputs.target_os == 'macOS' }}
     name: create release for macOS
     steps:
