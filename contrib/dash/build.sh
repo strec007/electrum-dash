@@ -4,7 +4,6 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 REPO_DIR="$(realpath $SCRIPT_DIR/../../)"
 ACTIONS_DIR="$SCRIPT_DIR/actions"
-TRAVIS_DIR="$SCRIPT_DIR/travis"
 BUILD_DIST_DIR="$REPO_DIR/dist"
 BUILD_BIN_DIR="$REPO_DIR/bin"
 NAME=Dash-Electrum

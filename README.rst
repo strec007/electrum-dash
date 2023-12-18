@@ -9,14 +9,6 @@ Dash Electrum - Lightweight Dashpay client
   Homepage: https://electrum.dash.org/
 
 
-.. image:: https://travis-ci.org/ktechmidas/electrum-dash.svg?branch=master
-    :target: https://travis-ci.org/ktechmidas/electrum-dash
-    :alt: Build Status
-
-
-
-
-
 Getting started
 ===============
 
