@@ -57,7 +57,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/dash/travis/electrum_dash_version_env.sh
+          source ./contrib/dash/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
@@ -101,7 +101,7 @@ jobs:
       - name: Set outputs for pkg_ver, apk_ver, vercode, is_release
         id: set_vars
         run: |
-          source ./contrib/dash/travis/electrum_dash_version_env.sh
+          source ./contrib/dash/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
           echo "apk_ver=$(echo $DASH_ELECTRUM_APK_VERSION)" >> $GITHUB_OUTPUT
           echo "vercode=$(echo $DASH_ELECTRUM_VERSION_CODE)" >> $GITHUB_OUTPUT
@@ -145,7 +145,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/dash/travis/electrum_dash_version_env.sh
+          source ./contrib/dash/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
@@ -193,7 +193,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/dash/travis/electrum_dash_version_env.sh
+          source ./contrib/dash/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
