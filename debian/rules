@@ -1,11 +1,5 @@
 #!/usr/bin/make -f
 
-ifneq (,$(findstring Python 3.5,$(shell python3 --version 2>&1)))
-    PYTHON3=python3.6
-else
-    PYTHON3=python3
-endif
-
 export DH_VERBOSE=1
 export DH_UPGRADE_PIP
 export DH_UPGRADE_SETUPTOOLS
