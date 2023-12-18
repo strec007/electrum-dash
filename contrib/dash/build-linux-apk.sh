@@ -1,13 +1,20 @@
 #!/bin/bash
 set -ev
 
-source contrib/android/docker_env.sh
+if [[ $ELECTRUM_MAINNET == "true" ]] && [[ -z $IS_RELEASE ]]; then
+    # do not build mainnet apk if is not release
+    exit 0
+fi
 
+cd build
+
+pushd electrum-dash
 ./contrib/make_locale
 find . -name '*.po' -delete
 find . -name '*.pot' -delete
+popd
 
-pushd contrib/android
+pushd electrum-dash/contrib/android
 python3 -m virtualenv --python=python3 atlas_env
 source atlas_env/bin/activate
 pip install Kivy Pillow
@@ -17,7 +24,7 @@ rm -rf atlas_env
 popd
 
 # patch buildozer to support APK_VERSION_CODE env
-VERCODE_PATCH_PATH=/home/buildozer/build/contrib/dash/
+VERCODE_PATCH_PATH=/home/buildozer/build/contrib/dash
 VERCODE_PATCH="$VERCODE_PATCH_PATH/read_apk_version_code.patch"
 
 DOCKER_CMD="pushd /opt/buildozer"
@@ -35,10 +42,10 @@ if [[ $ELECTRUM_MAINNET == "false" ]]; then
     DOCKER_CMD="$DOCKER_CMD release-testnet"
 fi
 
-sudo chown -R 1000 .
+sudo chown -R 1000 electrum-dash
 docker run --rm \
     --env APP_ANDROID_ARCH=$APP_ANDROID_ARCH \
     --env APK_VERSION_CODE=$DASH_ELECTRUM_VERSION_CODE \
-    -v $(pwd):/home/buildozer/build \
-    -t $DOCKER_IMG_BUILD_ANDROID bash -c \
+    -v $(pwd)/electrum-dash:/home/buildozer/build \
+    -t zebralucky/electrum-dash-winebuild:Kivy40x bash -c \
     "$DOCKER_CMD"

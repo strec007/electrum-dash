@@ -111,18 +111,18 @@ function build_apk {
     # Build mainnet release apk
     if [[ -n $IS_RELEASE ]]; then
         sudo rm -rf build
-        mkdir -p build && cp contrib/dash/travis/* ./build/
+        mkdir -p build && cp contrib/dash/* ./build/
         export ELECTRUM_MAINNET=true
-        ./build/travis-build-linux-apk.sh
+        ./build/build-linux-apk.sh
         cp ${BUILD_BIN_DIR}/${APK_NAME}-$DASH_ELECTRUM_APK_VERSION-$APP_ANDROID_ARCH-$UAPK_TAIL \
             ${BUILD_DIST_DIR}
     fi
 
     # Build testnet release apk
     sudo rm -rf build
-    mkdir -p build && cp contrib/dash/travis/* ./build/
+    mkdir -p build && cp contrib/dash/* ./build/
     export ELECTRUM_MAINNET=false
-    ./build/travis-build-linux-apk.sh
+    ./build/build-linux-apk.sh
     cp ${BUILD_BIN_DIR}/${APK_TNAME}-$DASH_ELECTRUM_APK_VERSION-$APP_ANDROID_ARCH-$UAPK_TAIL \
         ${BUILD_DIST_DIR}
 }
@@ -179,7 +179,7 @@ function build_linux {
 }
 
 
-source contrib/dash/travis/electrum_dash_version_env.sh
+source contrib/dash/electrum_dash_version_env.sh
 if [[ -n $IS_RELEASE ]]; then
     echo electrum-dash version is $DASH_ELECTRUM_VERSION, release build
 else
