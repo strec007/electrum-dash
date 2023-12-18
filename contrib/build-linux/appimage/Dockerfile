@@ -54,8 +54,8 @@ RUN apt-get update -q && \
 
 # note: compiling python 3.8.x requires at least glibc 2.27,
 #       which is first available on ubuntu 18.04
-ENV PYTHON_VERSION=3.7.10 \
-    PY_SHA=f8d82e7572c86ec9d55c8627aae5040124fd2203af400c383c821b980306ee6b \
+ENV PYTHON_VERSION=3.10.13 \
+    PY_SHA=5c88848668640d3e152b35b4536ef1c23b2ca4bd2c957ef1ecbb053f571dd3f6 \
     LIBSECP_VERSION=dbd41db16a0e91b2566820898a3ab2d7dad4fe00 \
     APPDIR=/var/build/appimage/electrum-dash.AppDir \
     PYTHON_FTP=https://www.python.org/ftp/python
