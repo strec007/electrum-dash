@@ -2,16 +2,17 @@
 set -ev
 
 export MACOSX_DEPLOYMENT_TARGET=10.13
+export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=true
 
-#PYTHON_VERSION=3.10.11
-#PYFTP=https://www.python.org/ftp/python/$PYTHON_VERSION
-#PYPKG_NAME=python-$PYTHON_VERSION-macos11.pkg
-#PY_SHA256=767ed35ad688d28ea4494081ae96408a0318d0d5bb9ca0139d74d6247b231cfc
-#echo "$PY_SHA256  $PYPKG_NAME" > $PYPKG_NAME.sha256
-#curl -O $PYFTP/$PYPKG_NAME
-#shasum -a256 -s -c $PYPKG_NAME.sha256
-#sudo installer -pkg $PYPKG_NAME -target /
-#rm $PYPKG_NAME $PYPKG_NAME.sha256
+PYTHON_VERSION=3.10.11
+PYFTP=https://www.python.org/ftp/python/$PYTHON_VERSION
+PYPKG_NAME=python-$PYTHON_VERSION-macos11.pkg
+PY_SHA256=767ed35ad688d28ea4494081ae96408a0318d0d5bb9ca0139d74d6247b231cfc
+echo "$PY_SHA256  $PYPKG_NAME" > $PYPKG_NAME.sha256
+curl -O $PYFTP/$PYPKG_NAME
+shasum -a256 -s -c $PYPKG_NAME.sha256
+sudo installer -pkg $PYPKG_NAME -target /
+rm $PYPKG_NAME $PYPKG_NAME.sha256
 
 LIBUSB_VER=1.0.24
 LIBUSB_URI=https://github.com/libusb/libusb/releases/download
@@ -40,7 +41,7 @@ rm -f libsecp256k1.0.dylib
 cp libsecp256k1/libsecp256k1.0.dylib .
 rm -rf libsecp256k1/ ${LSECP256K1_FILE} ${LSECP256K1_FILE}.sha256
 
-brew install gettext libtool automake pkg-config virtualenv python@3.10
+brew install gettext libtool automake pkg-config virtualenv
 
 echo "Building ZBar dylib..."
 rm -f libzbar.0.dylib
