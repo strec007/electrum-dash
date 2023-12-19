@@ -18,7 +18,7 @@ RUN apt-get update -q && \
         autopoint \
         xz-utils \
         libssl-dev \
-        libssl1.0.0 \
+        libssl1.1 \
         openssl \
         zlib1g-dev \
         libffi-dev \
