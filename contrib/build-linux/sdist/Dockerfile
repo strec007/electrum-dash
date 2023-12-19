@@ -12,6 +12,7 @@ RUN apt-get update -y \
     && apt-get install -y \
         python3-pip \
         gettext \
+        libssl-dev \
         python3-pycurl \
         python3-requests \
         libgmp-dev \
