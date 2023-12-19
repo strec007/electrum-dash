@@ -40,7 +40,7 @@ rm -f libsecp256k1.0.dylib
 cp libsecp256k1/libsecp256k1.0.dylib .
 rm -rf libsecp256k1/ ${LSECP256K1_FILE} ${LSECP256K1_FILE}.sha256
 
-brew link --overwrite python@3.12
+brew unlink python@3.12
 
 brew install gettext libtool automake pkg-config virtualenv
 
