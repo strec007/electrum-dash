@@ -50,5 +50,6 @@ brew install gettext libtool automake pkg-config virtualenv
 echo "Building ZBar dylib..."
 rm -f libzbar.0.dylib
 export MACOSX_DEPLOYMENT_TARGET=10.13
+export GCC_STRIP_BINARIES=0
 ./contrib/make_zbar.sh
 rm -rf contrib/zbar/
