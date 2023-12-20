@@ -9,14 +9,15 @@ source env/bin/activate
 PIP_CMD="pip"
 
 $PIP_CMD install --no-warn-script-location \
-    -r contrib/deterministic-build/requirements-build-mac.txt
-$PIP_CMD install --no-warn-script-location \
     -r contrib/deterministic-build/requirements.txt
 $PIP_CMD install --no-warn-script-location \
     -r contrib/deterministic-build/requirements-hw.txt
 $PIP_CMD install --no-warn-script-location \
     -r contrib/deterministic-build/requirements-binaries-mac.txt
 $PIP_CMD install --no-warn-script-location x11_hash>=1.4
+$PIP_CMD install --no-warn-script-location \
+    -r contrib/deterministic-build/requirements-build-mac.txt
+
 export PATH="/usr/local/opt/gettext/bin:$PATH"
 ./contrib/make_locale
 find . -name '*.po' -delete
