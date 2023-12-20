@@ -1,4 +1,4 @@
-name: Build release workflow
+name: Build release workflow - test
 
 on:
   workflow_dispatch:
@@ -17,6 +17,7 @@ on:
             - Windows
             - macOS
             - Android
+            - Test
       prerelease:
         description: "True to set 'Pre-Release' option"
         required: true
@@ -25,8 +26,8 @@ on:
         description: "True to set 'Draft' option"
         required: true
         type: boolean
-
 jobs:
+
   create_release:
     runs-on: ubuntu-22.04
     name: Create github release
@@ -56,7 +57,7 @@ jobs:
 
   build_osx:
     needs: create_release
-    runs-on: macos-13
+    runs-on: macos-11
     if: ${{ inputs.target_os == 'All' || inputs.target_os == 'macOS' }}
     name: create release for macOS
     steps:
@@ -65,7 +66,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/dash/electrum_dash_version_env.sh
+          source ./contrib/dash/travis/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
@@ -109,7 +110,7 @@ jobs:
       - name: Set outputs for pkg_ver, apk_ver, vercode, is_release
         id: set_vars
         run: |
-          source ./contrib/dash/electrum_dash_version_env.sh
+          source ./contrib/dash/travis/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
           echo "apk_ver=$(echo $DASH_ELECTRUM_APK_VERSION)" >> $GITHUB_OUTPUT
           echo "vercode=$(echo $DASH_ELECTRUM_VERSION_CODE)" >> $GITHUB_OUTPUT
@@ -153,7 +154,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/dash/electrum_dash_version_env.sh
+          source ./contrib/dash/travis/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
@@ -201,7 +202,7 @@ jobs:
       - name: Set outputs for pkg_ver
         id: set_vars
         run: |
-          source ./contrib/dash/electrum_dash_version_env.sh
+          source ./contrib/dash/travis/electrum_dash_version_env.sh
           echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
       - name: Prepare build
         env:
@@ -229,3 +230,54 @@ jobs:
           tag: ${{ inputs.tag }}
           asset_path: dist/Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
           asset_name: Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win64.exe
+
+  test:
+    needs: create_release
+    runs-on: ubuntu-22.04
+    if: ${{ inputs.target_os == 'test' }}
+    env:
+      APP_ANDROID_ARCH: 'arm64-v8a'
+      ELECTRUM_MAINNET: true
+    name: create release for Android
+    steps:
+      - name: Install apt packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install gettext python3-virtualenv
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set outputs for pkg_ver, apk_ver, vercode, is_release
+        id: set_vars
+        run: |
+          source ./contrib/dash/travis/electrum_dash_version_env.sh
+          echo "pkg_ver=$(echo $DASH_ELECTRUM_VERSION)" >> $GITHUB_OUTPUT
+          echo "apk_ver=$(echo $DASH_ELECTRUM_APK_VERSION)" >> $GITHUB_OUTPUT
+          echo "vercode=$(echo $DASH_ELECTRUM_VERSION_CODE)" >> $GITHUB_OUTPUT
+          echo "is_release=$(echo $IS_RELEASE)" >> $GITHUB_OUTPUT
+      - name: Prepare build
+        if: ${{ steps.set_vars.outputs.is_release }}
+        env:
+          DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
+          DASH_ELECTRUM_APK_VERSION: ${{ steps.set_vars.outputs.apk_ver }}
+          DASH_ELECTRUM_VERSION_CODE: ${{ steps.set_vars.outputs.vercode }}
+          IS_RELEASE: ${{ steps.set_vars.outputs.is_release }}
+        run: |
+          ./contrib/dash/actions/install-linux-apk.sh
+      - name: Build apk
+        if: ${{ steps.set_vars.outputs.is_release }}
+        env:
+          DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
+          DASH_ELECTRUM_APK_VERSION: ${{ steps.set_vars.outputs.apk_ver }}
+          DASH_ELECTRUM_VERSION_CODE: ${{ steps.set_vars.outputs.vercode }}
+          IS_RELEASE: ${{ steps.set_vars.outputs.is_release }}
+        run: |
+          ./contrib/dash/actions/script-linux-apk.sh
+      - name: Upload Release Asset
+        if: ${{ steps.set_vars.outputs.is_release }}
+        uses: Bertrand256/upload-release-asset@v1.0.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ inputs.tag }}
+          asset_path: dist/${{ 'MAINNET' }}-${{ steps.set_vars.outputs.apk_ver }}-${{ matrix.arch }}-release-unsigned.apk
+          asset_name: ${{ 'MAINNET' }}-${{ steps.set_vars.outputs.apk_ver }}-${{ matrix.arch }}-release-unsigned.apk
