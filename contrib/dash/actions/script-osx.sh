@@ -6,7 +6,7 @@ export MACOSX_DEPLOYMENT_TARGET=10.13
 
 echo osx build version is $DASH_ELECTRUM_VERSION
 
-virtualenv -p python3 env
+virtualenv -p python3.10 env
 source env/bin/activate
 PIP_CMD="pip"
 
