@@ -41,8 +41,6 @@ rm -f libsecp256k1.0.dylib
 cp libsecp256k1/libsecp256k1.0.dylib .
 rm -rf libsecp256k1/ ${LSECP256K1_FILE} ${LSECP256K1_FILE}.sha256
 
-export "CFLAGS=-I/usr/local/include -L/usr/local/lib"
-
 brew install gettext libtool automake pkg-config virtualenv gmp
 
 echo "Building ZBar dylib..."

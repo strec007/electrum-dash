@@ -1,7 +1,9 @@
 #!/bin/bash
 set -ev
 
+export "CFLAGS=-I/usr/local/include -L/usr/local/lib"
 export MACOSX_DEPLOYMENT_TARGET=10.13
+
 echo osx build version is $DASH_ELECTRUM_VERSION
 
 virtualenv -p python3 env
