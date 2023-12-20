@@ -45,7 +45,7 @@ Open the *Terminal* app and execute the following commands:
 ```
 /bin/bash
 cd ~/electrum-dash
-source ./contrib/dash/travis/electrum_dash_version_env.sh
+source ./contrib/dash/electrum_dash_version_env.sh
 ./contrib/dash/actions/install-osx.sh
 ./contrib/dash/actions/script-osx.sh
 ```
@@ -185,7 +185,7 @@ sudo apt install openjdk-17-jdk-headless
 In the Linux terminal, execute the following commands:
 ```
 cd ~/electrum-dash
-source ./contrib/dash/travis/electrum_dash_version_env.sh
+source ./contrib/dash/electrum_dash_version_env.sh
 ./contrib/dash/actions/install-linux-apk.sh
 
 # building binaries for MAINNET:

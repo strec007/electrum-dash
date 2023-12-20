@@ -4,7 +4,7 @@ import sys
 
 
 try:
-    from x11_hash import getPoWHash
+    from dash_hash import getPoWHash
     import_success = True
     load_libx11hash = False
 except ImportError:

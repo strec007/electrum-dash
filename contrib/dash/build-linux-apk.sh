@@ -7,13 +7,6 @@ if [[ $ELECTRUM_MAINNET == "true" ]] && [[ -z $IS_RELEASE ]]; then
 fi
 
 cd build
-if [[ -n $TRAVIS_TAG ]]; then
-    BUILD_REPO_URL=https://github.com/Bertrand256/electrum-dash.git
-    git clone --branch $TRAVIS_TAG $BUILD_REPO_URL electrum-dash
-else
-    git clone .. electrum-dash
-fi
-
 
 pushd electrum-dash
 ./contrib/make_locale
@@ -31,7 +24,7 @@ rm -rf atlas_env
 popd
 
 # patch buildozer to support APK_VERSION_CODE env
-VERCODE_PATCH_PATH=/home/buildozer/build/contrib/dash/travis
+VERCODE_PATCH_PATH=/home/buildozer/build/contrib/dash
 VERCODE_PATCH="$VERCODE_PATCH_PATH/read_apk_version_code.patch"
 
 DOCKER_CMD="pushd /opt/buildozer"

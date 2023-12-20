@@ -10,11 +10,11 @@ on:
 
 jobs:
   run_tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     name: Run tests
     strategy:
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.10.13]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -33,12 +33,3 @@ jobs:
         run: |
           tox
 
-  upload_notify_artifact:
-    runs-on: ubuntu-18.04
-    if: always()
-    name: Upload Notify Artifact
-    steps:
-      - name: Upload Notify Artifact
-        uses: zebra-lucky/actions-js-slackJobsStatus@0.0.2
-        with:
-          gh_ctx: ${{ toJson(github) }}

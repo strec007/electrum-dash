@@ -63,7 +63,7 @@ def get_connected_hw_devices(plugins):
         name, plugin = splugin.name, splugin.plugin
         if not plugin:
             e = splugin.exception
-            print_stderr(f"{name}: error during plugin init: {repr(e)}")
+            print(f"{name}: error during plugin init: {repr(e)}", file=sys.stderr)
             continue
         try:
             u = devmgr.unpaired_device_infos(None, plugin)
@@ -89,7 +89,7 @@ def get_passwd_for_hw_device_encrypted_storage(plugins):
     try:
         xpub = plugin.get_xpub(device_info.device.id_, derivation,
                                'standard', plugin.handler)
-    except UserCancelled:
+    except UserCancelled: # noqa: F821
         sys.exit(0)
     password = keystore.Xpub.get_pubkey_from_xpub(xpub, ())
     return password

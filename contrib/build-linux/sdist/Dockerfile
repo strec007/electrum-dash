@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 LABEL description="Dedicated to building Electrum Dash sdist for Linux"
 
 ENV LANG="en_US.UTF-8" \
@@ -12,6 +12,7 @@ RUN apt-get update -y \
     && apt-get install -y \
         python3-pip \
         gettext \
+        libssl-dev \
         python3-pycurl \
         python3-requests \
         libgmp-dev \

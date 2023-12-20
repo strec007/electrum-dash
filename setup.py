@@ -12,9 +12,10 @@ import subprocess
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
-MIN_PYTHON_VERSION = "3.6.1"
+MIN_PYTHON_VERSION = "3.10.0"
 _min_python_version_tuple = tuple(map(int, (MIN_PYTHON_VERSION.split("."))))
 
+print("Current Python Version:", (sys.version_info[:3]))
 
 if sys.version_info[:3] < _min_python_version_tuple:
     sys.exit("Error: Dash Electrum requires Python version >= %s..." % MIN_PYTHON_VERSION)

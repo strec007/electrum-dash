@@ -2,11 +2,12 @@
 set -ev
 
 export MACOSX_DEPLOYMENT_TARGET=10.13
+export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=true
 
-PYTHON_VERSION=3.7.9
+PYTHON_VERSION=3.10.11
 PYFTP=https://www.python.org/ftp/python/$PYTHON_VERSION
-PYPKG_NAME=python-$PYTHON_VERSION-macosx10.9.pkg
-PY_SHA256=bf54a14eef23467991e8c7a88c7307762e484c024a94ec1ee292ac1db3d41fc9
+PYPKG_NAME=python-$PYTHON_VERSION-macos11.pkg
+PY_SHA256=767ed35ad688d28ea4494081ae96408a0318d0d5bb9ca0139d74d6247b231cfc
 echo "$PY_SHA256  $PYPKG_NAME" > $PYPKG_NAME.sha256
 curl -O $PYFTP/$PYPKG_NAME
 shasum -a256 -s -c $PYPKG_NAME.sha256
@@ -40,10 +41,11 @@ rm -f libsecp256k1.0.dylib
 cp libsecp256k1/libsecp256k1.0.dylib .
 rm -rf libsecp256k1/ ${LSECP256K1_FILE} ${LSECP256K1_FILE}.sha256
 
-brew install gettext libtool automake pkg-config virtualenv
+brew install gettext libtool automake pkg-config virtualenv gmp
 
 echo "Building ZBar dylib..."
 rm -f libzbar.0.dylib
 export MACOSX_DEPLOYMENT_TARGET=10.13
+export GCC_STRIP_BINARIES=0
 ./contrib/make_zbar.sh
 rm -rf contrib/zbar/

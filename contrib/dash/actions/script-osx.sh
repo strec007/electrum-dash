@@ -1,12 +1,12 @@
 #!/bin/bash
 set -ev
 
+export "CFLAGS=-I/usr/local/include -L/usr/local/lib"
 export MACOSX_DEPLOYMENT_TARGET=10.13
-export PY37BINDIR=/Library/Frameworks/Python.framework/Versions/3.7/bin/
-export PATH=$PATH:$PY37BINDIR
+
 echo osx build version is $DASH_ELECTRUM_VERSION
 
-virtualenv -p ${PY37BINDIR}/python3 env
+virtualenv -p python3.10 env
 source env/bin/activate
 PIP_CMD="pip"
 
