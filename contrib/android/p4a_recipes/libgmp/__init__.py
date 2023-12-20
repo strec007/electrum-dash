@@ -8,7 +8,7 @@ import sh
 
 class LibGMPRecipe(Recipe):
 
-    url = 'https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz'
+    url = 'https://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz'
     sha256sum = 'fd4829912cddd12f84181c3451cc752be224643e87fac497b69edddadc49b4f2'
     version = '6.2.1'
 
