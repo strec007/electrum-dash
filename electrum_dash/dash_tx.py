@@ -30,7 +30,7 @@ from enum import IntEnum
 from ipaddress import ip_address, IPv6Address
 from bls_py import bls
 
-from .util import bh2u, bfh
+from .util import bh2u, bfh, pack_varint
 from .bitcoin import COIN
 from .crypto import sha256d
 from .i18n import _
@@ -639,7 +639,7 @@ class DashProUpRevTx(ProTxBase):
 class DashCbTx(ProTxBase):
     '''Class representing DIP4 coinbase special tx'''
 
-    __slots__ = ('version height merkleRootMNList merkleRootQuorums').split()
+    __slots__ = ('version height merkleRootMNList merkleRootQuorums bestCLHeightDiff bestCLSignature assetLockedAmount').split()
 
     def __str__(self):
         res = ('CbTx Version: %s\n'
@@ -650,6 +650,13 @@ class DashCbTx(ProTxBase):
         if self.version > 1:
             res += ('merkleRootQuorums: %s\n' %
                     bh2u(self.merkleRootQuorums[::-1]))
+        if self.version > 2:
+            res += ('bestCLHeightDiff: %s\n' %
+                    self.bestCLHeightDiff)
+            res += ('bestCLSignature: %s\n' %
+                    bh2u(self.bestCLSignature[::-1]))
+            res += ('assetLockedAmount: %s\n' %
+                    self.assetLockedAmount)
         return res
 
     def serialize(self):
@@ -663,7 +670,15 @@ class DashCbTx(ProTxBase):
         if self.version > 1:
             assert len(self.merkleRootQuorums) == 32, \
                 f'{len(self.merkleRootQuorums)} not 32'
-            res += self.merkleRootQuorums               # merkleRootQuorums
+            res += self.merkleRootQuorums
+        if self.version > 2:
+            # assert len(self.bestCLHeightDiff) == 32, \
+            #     f'{len(self.bestCLHeightDiff)} not 32'
+            res += pack_varint(self.bestCLHeightDiff)              # bestCLHeightDiff
+            assert len(self.bestCLSignature) == 96, \
+                f'{len(self.bestCLSignature)} not 96'
+            res += self.bestCLSignature               # bestCLSignature
+            res += struct.pack('<q', self.assetLockedAmount)               # assetLockedAmount
         return res
 
     @classmethod
@@ -672,9 +687,17 @@ class DashCbTx(ProTxBase):
         height = vds.read_uint32()
         merkleRootMNList = vds.read_bytes(32)
         merkleRootQuorums = b''
+        bestCLHeightDiff = 0
+        bestCLSignature = ""
+        assetLockedAmount = 0
         if version > 1:
             merkleRootQuorums = vds.read_bytes(32)
-        return DashCbTx(version, height, merkleRootMNList, merkleRootQuorums)
+        if version > 2:
+            bestCLHeightDiff = vds.read_varint()
+            bestCLSignature = vds.read_bytes(96)
+            assetLockedAmount = vds.read_uint64()
+        return DashCbTx(version, height, merkleRootMNList, merkleRootQuorums,
+                        bestCLHeightDiff, bestCLSignature, assetLockedAmount)
 
 
 class DashSubTxRegister(ProTxBase):
