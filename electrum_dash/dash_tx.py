@@ -670,15 +670,13 @@ class DashCbTx(ProTxBase):
         if self.version > 1:
             assert len(self.merkleRootQuorums) == 32, \
                 f'{len(self.merkleRootQuorums)} not 32'
-            res += self.merkleRootQuorums
+            res += self.merkleRootQuorums               # merkleRootMNList
         if self.version > 2:
-            # assert len(self.bestCLHeightDiff) == 32, \
-            #     f'{len(self.bestCLHeightDiff)} not 32'
-            res += pack_varint(self.bestCLHeightDiff)              # bestCLHeightDiff
+            res += pack_varint(self.bestCLHeightDiff)   # bestCLHeightDiff
             assert len(self.bestCLSignature) == 96, \
                 f'{len(self.bestCLSignature)} not 96'
-            res += self.bestCLSignature               # bestCLSignature
-            res += struct.pack('<q', self.assetLockedAmount)               # assetLockedAmount
+            res += self.bestCLSignature                 # bestCLSignature
+            res += struct.pack('<q', self.assetLockedAmount)  # assetLockedAmount
         return res
 
     @classmethod
