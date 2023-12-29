@@ -28,8 +28,6 @@
 # Note: The deserialization code originally comes from ABE.
 
 import struct
-import traceback
-import sys
 import io
 import base64
 from typing import (Sequence, Union, NamedTuple, Tuple, Optional, Iterable,
