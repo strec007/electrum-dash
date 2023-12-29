@@ -48,6 +48,7 @@ import random
 import secrets
 import functools
 from abc import abstractmethod, ABC
+from struct import Struct
 
 import attr
 import aiohttp
@@ -97,6 +98,20 @@ FILE_OWNER_MODE = stat.S_IREAD | stat.S_IWRITE
 
 class UnknownBaseUnit(Exception): pass
 
+
+def pack_varint(n):
+    pack_byte = Struct('B').pack
+    pack_le_uint16 = Struct('<H').pack
+    pack_le_uint32 = Struct('<I').pack
+    pack_le_uint64 = Struct('<Q').pack
+
+    if n < 253:
+        return pack_byte(n)
+    if n < 65536:
+        return pack_byte(253) + pack_le_uint16(n)
+    if n < 4294967296:
+        return pack_byte(254) + pack_le_uint32(n)
+    return pack_byte(255) + pack_le_uint64(n)
 
 def decimal_point_to_base_unit_name(dp: int) -> str:
     # e.g. 8 -> "DASH"

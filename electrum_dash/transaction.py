@@ -28,8 +28,6 @@
 # Note: The deserialization code originally comes from ABE.
 
 import struct
-import traceback
-import sys
 import io
 import base64
 from typing import (Sequence, Union, NamedTuple, Tuple, Optional, Iterable,
@@ -91,6 +89,15 @@ class MissingTxInputAmount(Exception):
 
 
 SIGHASH_ALL = 1
+
+
+struct_le_H = struct.Struct('<H')
+struct_le_I = struct.Struct('<I')
+struct_le_Q = struct.Struct('<Q')
+
+unpack_le_uint16_from = struct_le_H.unpack_from
+unpack_le_uint32_from = struct_le_I.unpack_from
+unpack_le_uint64_from = struct_le_Q.unpack_from
 
 
 class TxOutput:
@@ -309,6 +316,7 @@ class BCDataStream(object):
     def read_uint32(self): return self._read_num('<I')
     def read_int64(self): return self._read_num('<q')
     def read_uint64(self): return self._read_num('<Q')
+    def read_varint(self): return self._read_varint()
 
     def write_boolean(self, val): return self.write(b'\x01' if val else b'\x00')
     def write_char(self, val): return self._write_num('<b', val)
@@ -358,6 +366,32 @@ class BCDataStream(object):
         except Exception as e:
             raise SerializationError(e) from e
         return i
+
+    def _read_le_uint16(self):
+        result, = unpack_le_uint16_from(self.binary, self.cursor)
+        self.cursor += 2
+        return result
+
+    def _read_le_uint32(self):
+        result, = unpack_le_uint32_from(self.binary, self.cursor)
+        self.cursor += 4
+        return result
+
+    def _read_le_uint64(self):
+        result, = unpack_le_uint64_from(self.binary, self.cursor)
+        self.cursor += 8
+        return result
+
+    def _read_varint(self):
+        n = self.input[self.read_cursor]
+        self.read_cursor += 1
+        if n < 253:
+            return n
+        if n == 253:
+            return self._read_le_uint16()
+        if n == 254:
+            return self._read_le_uint32()
+        return self._read_le_uint64()
 
     def _write_num(self, format, num):
         s = struct.pack(format, num)

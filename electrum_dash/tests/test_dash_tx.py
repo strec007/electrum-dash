@@ -44,7 +44,11 @@ CB_TX_D = {
     'merkleRootMNList': '76629a6e42fb519188f65889fd3ac020'
                         '1be87aa227462b5643e8bb2ec1d7a82a',
     'merkleRootQuorums': '',
-    'version': 1}
+    'version': 1,
+    'bestCLHeightDiff': 0,
+    'bestCLSignature': '',
+    'assetLockedAmount': 0,
+}
 
 
 CB_TX_V2 = (
@@ -66,7 +70,37 @@ CB_TX_V2_D = {
                          '27462b5643e8bb2ec1d7a82a'),
     'merkleRootQuorums': ('76629a6e42fb519188f65889fd3ac0201be87aa'
                           '227462b5643e8bb2ec1d7a82a'),
-    'version': 2}
+    'version': 2,
+    'bestCLHeightDiff': 0,
+    'bestCLSignature': '',
+    'assetLockedAmount': 0
+}
+
+CB_TX_V3 = (
+    '0300050001000000000000000000000000000000000000000000000000000000000000'
+    '0000ffffffff06035cbe0d0101ffffffff0397f4e127000000001976a914c69a0bda7d'
+    'aaae481be8def95e5f347a1d00a4b488ac94196f1600000000016a4dd5632500000000'
+    '1976a914c69a0bda7daaae481be8def95e5f347a1d00a4b488ac00000000af03005cbe'
+    '0d003c7a25cd3258d4141c1aca784232f28b92f94221c1d6add1c7221ebecffd201297'
+    '52cf4e10c95caefd2972782eb6ab4bc64170c148c9f32191be3f09d546a5e500b097da'
+    'dbd9741dabd85bec96ed8421499ec37aeb0ec48ff25c2a994a47e030ef1c5758bf1918'
+    'e4fd04c9f7b149df160800a9fdbf08311b93484e545a876e81e3408a4c8358f11ce2c9'
+    'c01206c39122875f9dbfea67e8953da4e63a1cd8551dfc94196f1600000000')
+
+CB_TX_V3_D = {
+    'height': 900700,
+    'merkleRootMNList': ('3c7a25cd3258d4141c1aca784232f28b92f94221'
+                         'c1d6add1c7221ebecffd2012'),
+    'merkleRootQuorums': ('9752cf4e10c95caefd2972782eb6ab4bc64170c1'
+                          '48c9f32191be3f09d546a5e5'),
+    'version': 3,
+    'bestCLHeightDiff': 0,
+    'bestCLSignature': (
+        'b097dadbd9741dabd85bec96ed8421499ec37aeb0ec48ff25c2a994a47e030ef'
+        '1c5758bf1918e4fd04c9f7b149df160800a9fdbf08311b93484e545a876e81e3'
+        '408a4c8358f11ce2c9c01206c39122875f9dbfea67e8953da4e63a1cd8551dfc'),
+    'assetLockedAmount': 376379796
+}
 
 
 PRO_REG_TX = (
@@ -436,6 +470,38 @@ class TestDashSpecTxSerialization(SequentialTestCase):
         assert extra2.version == extra.version
         assert extra2.height == extra.height
         assert extra2.merkleRootMNList == extra.merkleRootMNList
+
+    def test_dash_tx_cb_tx_v3(self):
+        tx = transaction.Transaction(CB_TX_V3)
+        deser = tx.to_json()
+        assert deser['version'] == 3
+        assert deser['tx_type'] == 5
+        extra_dict = deser['extra_payload']
+        assert extra_dict == CB_TX_V3_D
+        extra = tx.extra_payload
+        assert(str(extra))
+        assert extra.version == CB_TX_V3_D['version']
+        assert extra.height == CB_TX_V3_D['height']
+        assert len(extra.merkleRootMNList) == 32
+        assert extra.merkleRootMNList == bfh(CB_TX_V3_D['merkleRootMNList'])
+        assert len(extra.merkleRootQuorums) == 32
+        assert extra.merkleRootQuorums == bfh(CB_TX_V3_D['merkleRootQuorums'])
+        assert extra.bestCLHeightDiff == 0
+        assert len(extra.bestCLSignature) == 96
+        assert extra.bestCLSignature == bfh(CB_TX_V3_D['bestCLSignature'])
+        assert extra.assetLockedAmount == 376379796
+
+        ser = tx.serialize()
+        assert ser == CB_TX_V3
+
+        assert extra.to_hex_str() == CB_TX_V3[272:]
+        extra2 = ProTxBase.from_hex_str(SPEC_CB_TX, CB_TX_V3[272:])
+        assert extra2.version == extra.version
+        assert extra2.height == extra.height
+        assert extra2.merkleRootMNList == extra.merkleRootMNList
+        assert extra2.bestCLHeightDiff == extra.bestCLHeightDiff
+        assert extra2.bestCLSignature == extra.bestCLSignature
+        assert extra2.assetLockedAmount == extra.assetLockedAmount
 
     def test_dash_tx_pro_reg_tx(self):
         tx = transaction.Transaction(PRO_REG_TX)
