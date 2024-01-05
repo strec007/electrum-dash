@@ -91,16 +91,14 @@ class DashSporks:
     SPORKS_DEFAULTS = {
         SporkID.SPORK_2_INSTANTSEND_ENABLED.value: 0,               # ON
         SporkID.SPORK_3_INSTANTSEND_BLOCK_FILTERING.value: 0,       # ON
-        SporkID.SPORK_5_INSTANTSEND_MAX_VALUE.value: 1000,          # 1000 Dash
-        SporkID.SPORK_6_NEW_SIGS.value: Y2099,                      # OFF
         SporkID.SPORK_9_SUPERBLOCKS_ENABLED.value: Y2099,           # OFF
-        SporkID.SPORK_12_RECONSIDER_BLOCKS.value: 0,                # 0 Blocks
         SporkID.SPORK_15_DETERMINISTIC_MNS_ENABLED.value: Y2099,    # OFF
-        SporkID.SPORK_16_INSTANTSEND_AUTOLOCKS.value: Y2099,        # OFF
         SporkID.SPORK_17_QUORUM_DKG_ENABLED.value: Y2099,           # OFF
         SporkID.SPORK_19_CHAINLOCKS_ENABLED.value: Y2099,           # OFF
-        SporkID.SPORK_20_INSTANTSEND_LLMQ_BASED.value: Y2099,       # OFF
+        SporkID.SPORK_21_QUORUM_ALL_CONNECTED.value: Y2099,  # OFF
+        SporkID.SPORK_23_QUORUM_POSE.value: Y2099,  # OFF
     }
+
 
     def __init__(self):
         self.from_peers = set()
