@@ -267,7 +267,7 @@ class MNList(Logger):
             rlc['llmq_hashes'] = {}
             # Save values as hex strings
             for k, v in rl['protx_mns'].items():
-                rlc['protx_mns'][k] = v.serialize(as_hex=True)
+                rlc['protx_mns'][k] = v.serialize(as_hex=True, include_version=True)
             for k, v in rl['sml_hashes'].items():
                 rlc['sml_hashes'][k] = bh2u(v[::-1])
             for k, v in rl['quorums'].items():

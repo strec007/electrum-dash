@@ -239,53 +239,66 @@ class DeletedQuorum(namedtuple('DeletedQuorum', 'llmqType quorumHash')):
 
 
 class DashSMLEntry(namedtuple('DashSMLEntry',
-                              'proRegTxHash confirmedHash ipAddress port'
-                              ' pubKeyOperator keyIDVoting isValid')):
+                              'version proRegTxHash confirmedHash ipAddress port'
+                              ' pubKeyOperator keyIDVoting isValid nType platformHTTPPort platformNodeID')):
     '''Class representing Simplified Masternode List entry'''
 
     def __str__(self):
-        return ('DashSMLEntry: proRegTxHash: %s, confirmedHash: %s,'
+        return ('DashSMLEntry: version %s, proRegTxHash: %s, confirmedHash: %s,'
                 ' ipAddress: %s, port: %s, pubKeyOperator: %s,'
-                ' keyIDVoting: %s, isValid: %s' %
-                (bh2u(self.proRegTxHash[::-1]), bh2u(self.confirmedHash[::-1]),
+                ' keyIDVoting: %s, isValid: %s nType %s platformHTTPPort %s platformNodeID %s' %
+                (self.version, bh2u(self.proRegTxHash[::-1]), bh2u(self.confirmedHash[::-1]),
                  str_ip(self.ipAddress), self.port, bh2u(self.pubKeyOperator),
-                 bh2u(self.keyIDVoting), self.isValid))
+                 bh2u(self.keyIDVoting), self.isValid, self.nType, self.platformHTTPPort, self.platformNodeID))
 
     def as_dict(self):
         return {
+            'version': self.version,
             'proRegTxHash': bh2u(self.proRegTxHash[::-1]),
             'confirmedHash': bh2u(self.confirmedHash[::-1]),
             'service': f'{str_ip(self.ipAddress)}:{self.port}',
             'pubKeyOperator': bh2u(self.pubKeyOperator),
             'votingAddress': hash160_to_p2pkh(self.keyIDVoting),
             'isValid': self.isValid,
+            'nType': self.nType,
+            'platformHTTPPort': self.platformHTTPPort,
+            'platformNodeID': bh2u(self.platformNodeID) if self.platformNodeID else None,
         }
 
     @classmethod
     def from_dict(cls, d):
+        version = d['version']
         proRegTxHash = bfh(d['proRegTxHash'])[::-1]
         confirmedHash = bfh(d['confirmedHash'])[::-1]
         ipAddress, port = service_to_ip_port(d['service'])
         pubKeyOperator = bfh(d['pubKeyOperator'])
         keyIDVoting = b58_address_to_hash160(d['votingAddress'])[1]
         isValid = d['isValid']
-        return DashSMLEntry(proRegTxHash, confirmedHash, ipAddress,
-                            port, pubKeyOperator, keyIDVoting, isValid)
+        nType = d['nType']
+        platformHTTPPort = d['platformHTTPPort']
+        platformNodeID = d['platformNodeID']
+        return DashSMLEntry(version, proRegTxHash, confirmedHash, ipAddress,
+                            port, pubKeyOperator, keyIDVoting, isValid, nType, platformHTTPPort, platformNodeID)
 
-    def serialize(self, as_hex=False):
+    def serialize(self, as_hex=False, include_version=False):
         assert len(self.proRegTxHash) == 32
         assert len(self.confirmedHash) == 32
         assert len(self.pubKeyOperator) == 48
         assert len(self.keyIDVoting) == 20
         ipAddress = serialize_ip(self.ipAddress)
+
         res = (
+           (pack('<H', self.version) if include_version else b'') + # version, only P2P field
             self.proRegTxHash +                         # proRegTxHash
-            self.confirmedHash +                        # confirmedHash
-            ipAddress +                                 # ipAddress
-            pack('>H', self.port) +                     # port
+            self.confirmedHash +                           # confirmedHash
+            ipAddress +                                # ipAddress
+            pack('>H', self.port) +           # port
             self.pubKeyOperator +                       # pubKeyOperator
             self.keyIDVoting +                          # keyIDVoting
-            pack('B', self.isValid)                     # isValid
+            pack('B', self.isValid) +         # isValid
+            (pack('<H', self.nType) if self.version > 1 else b'') +   # nType
+            (pack('<H', self.platformHTTPPort) if self.version > 1 and self.nType == 1 else b'') + # platformHTTPPort
+            (self.platformNodeID if self.version > 1 and self.nType == 1 else b'')  # platformNodeID
         )
         if as_hex:
             return bh2u(res)
@@ -300,17 +313,31 @@ class DashSMLEntry(namedtuple('DashSMLEntry',
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
+        nType = None
+        platformHTTPPort = None
+        platformNodeID = None
+
+        version = vds.read_int16()                      # version
         proRegTxHash = vds.read_bytes(32)               # proRegTxHash
         confirmedHash = vds.read_bytes(32)              # confirmedHash
         ipAddress = ip_address(vds.read_bytes(16))      # ipAddress
         port = read_uint16_nbo(vds)                     # port
         pubKeyOperator = vds.read_bytes(48)             # pubKeyOperator
         keyIDVoting = vds.read_bytes(20)                # keyIDVoting
-        isValid = vds.read_uchar()                      # isValid
+        isValid = vds.read_uchar()
+
+        if version > 1:
+            nType = vds.read_int16()  # nType
+
+            if nType == 1:
+                platformHTTPPort = vds.read_uint16()  # port
+                platformNodeID = vds.read_bytes(20)  # proRegTxHash
+
+        # isValid
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashSMLEntry(proRegTxHash, confirmedHash, ipAddress,
-                            port, pubKeyOperator, keyIDVoting, isValid)
+        return DashSMLEntry(version, proRegTxHash, confirmedHash, ipAddress,
+                            port, pubKeyOperator, keyIDVoting, isValid, nType, platformHTTPPort, platformNodeID)
 
 
 class DashInventory(namedtuple('DashInventory', 'type hash')):
