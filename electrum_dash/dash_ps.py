@@ -520,6 +520,7 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
                     continue
                 if not self.check_llmq_ready():
                     self.logger.info('LLMQ height {0}, LLMQ tip {1}'
+                                     .format(self.network.mn_list.llmq_height, self.network.mn_list.llmq_tip))
                     self.logger.info(_('New collateral workflow: {}')
                                      .format(self.LLMQ_DATA_NOT_READY))
                     await asyncio.sleep(5)
