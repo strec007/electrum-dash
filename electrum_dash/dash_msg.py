@@ -916,7 +916,7 @@ class DashMNListDiffMsg(DashMsgBase):
 class DashQFCommitMsg(DashMsgBase):
     '''Class representing qfcommit message'''
 
-    fields = ('version llmqType quorumHash signersSize signers'
+    fields = ('version llmqType quorumHash quorumIndex signersSize signers'
               ' validMembersSize validMembers quorumPublicKey quorumVvecHash'
               ' quorumSig sig').split()
 
@@ -950,6 +950,7 @@ class DashQFCommitMsg(DashMsgBase):
             pack('<H', self.version) +                  # version
             pack('B', self.llmqType) +                  # llmqType
             self.quorumHash +                           # quorumHash
+            (pack('<H', self.quorumIndex) if self.version == 2 or self.version == 4 else b'') +  # quorumIndex
             to_compact_size(self.signersSize) +         # signersSize
             self.signers +                              # signers
             to_compact_size(self.validMembersSize) +    # validMembersSize
@@ -966,9 +967,13 @@ class DashQFCommitMsg(DashMsgBase):
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
+        quorumIndex = 0
+
         version = vds.read_uint16()                     # version
         llmqType = vds.read_uchar()                     # llmqType
-        quorumHash = vds.read_bytes(32)                 # quorumHash
+        quorumHash = vds.read_bytes(32)     # quorumHash
+        if version == 2 or version == 4:
+            quorumIndex = vds.read_uint16()  # quorumHash
         signers_size = vds.read_compact_size()          # signersSize
         signers_bytes = (signers_size + 7) // 8
         signers = vds.read_bytes(signers_bytes)         # signers
@@ -981,7 +986,7 @@ class DashQFCommitMsg(DashMsgBase):
         sig = vds.read_bytes(96)                        # sig
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashQFCommitMsg(version, llmqType, quorumHash,
+        return DashQFCommitMsg(version, llmqType, quorumHash, quorumIndex,
                                signers_size, signers, valid_m_size,
                                validMembers, quorumPublicKey,
                                quorumVvecHash, quorumSig, sig)
