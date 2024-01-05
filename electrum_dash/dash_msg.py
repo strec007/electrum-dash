@@ -1164,19 +1164,19 @@ class DashDssuMsg(DashMsgBase):
 class DashDstxMsg(DashMsgBase):
     '''Class representing dstx message'''
 
-    fields = 'tx masternodeOutPoint vchSig sigTime'.split()
+    fields = 'tx protxHash vchSig sigTime'.split()
 
     def __init__(self, *args, **kwargs):
         super(DashDstxMsg, self).__init__(*args, **kwargs)
 
     def __str__(self):
-        return ('DashDstxMsg: masternodeOutPoint: %s, sigTime: %s' %
-                (self.masternodeOutPoint, self.sigTime))
+        return ('DashDstxMsg: protxHash: %s, sigTime: %s' %
+                (self.protxHash, self.sigTime))
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
         tx = Transaction.read_vds(vds)                  # tx
-        masternodeOutPoint = TxOutPoint.read_vds(vds)   # masternodeOutPoint
+        protxHash = vds.read_bytes(32)   # protxHash
         vchSig_len = vds.read_compact_size()
         if vchSig_len != 96:
             raise DashMsgError(f'dsq msg: wrong vchSig length')
@@ -1184,32 +1184,32 @@ class DashDstxMsg(DashMsgBase):
         sigTime = vds.read_int64()                      # sigTime
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashDstxMsg(tx, masternodeOutPoint, vchSig, sigTime)
+        return DashDstxMsg(tx, protxHash, vchSig, sigTime)
 
     def msg_hash(self):
         return sha256d(bfh(self.tx.serialize()) +
-                       self.masternodeOutPoint.serialize() +
+                       self.protxHash +
                        pack('<q', self.sigTime))
 
 
 class DashDsqMsg(DashMsgBase):
     '''Class representing dsq message'''
 
-    fields = 'nDenom masternodeOutPoint nTime fReady vchSig'.split()
+    fields = 'nDenom protxHash nTime fReady vchSig'.split()
 
     def __init__(self, *args, **kwargs):
         super(DashDsqMsg, self).__init__(*args, **kwargs)
 
     def __str__(self):
-        return ('DashDsqMsg: nDenom: %s, masternodeOutPoint: %s,'
+        return ('DashDsqMsg: nDenom: %s, protxHash: %s,'
                 ' nTime: %s, fReady: %s' %
-                (self.nDenom, self.masternodeOutPoint,
+                (self.nDenom, self.protxHash,
                  self.nTime, self.fReady))
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
         nDenom = vds.read_int32()                       # nDenom
-        masternodeOutPoint = TxOutPoint.read_vds(vds)   # masternodeOutPoint
+        protxHash = vds.read_bytes(32)                  # protx hash
         nTime = vds.read_int64()                        # nTime
         fReady = vds.read_uchar()                       # fReady
         vchSig_len = vds.read_compact_size()
@@ -1218,13 +1218,13 @@ class DashDsqMsg(DashMsgBase):
         vchSig = vds.read_bytes(96)                     # vchSig
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashDsqMsg(nDenom, masternodeOutPoint, nTime,
+        return DashDsqMsg(nDenom, protxHash, nTime,
                           fReady, vchSig)
 
     def serialize(self):
         return (
             pack('<i', self.nDenom) +                   # nDenom
-            self.masternodeOutPoint.serialize() +       # masternodeOutPoint
+            self.protxHash +       # protx
             pack('<q', self.nTime) +                    # nTime
             pack('B', self.fReady) +                    # fReady
             to_compact_size(len(self.vchSig)) +         # vchSig
@@ -1233,7 +1233,7 @@ class DashDsqMsg(DashMsgBase):
 
     def msg_hash(self):
         return sha256d(pack('<i', self.nDenom) +
-                       self.masternodeOutPoint.serialize() +
+                       self.protxHash +
                        pack('<q', self.nTime) +
                        pack('B', self.fReady))
 

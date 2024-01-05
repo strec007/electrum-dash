@@ -1664,7 +1664,7 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
                     dsq = self.dash_net.get_recent_dsq(recent_mns)
                     if dsq is not None:
                         self.logger.debug(f'get dsq from recent dsq queue'
-                                          f' {dsq.masternodeOutPoint}')
+                                          f' {dsq.protxHash}')
                         dval = PS_DENOM_REVERSE_DICT[dsq.nDenom]
                         wfl = await self.loop.run_in_executor(None,
                                                               _start, dval)

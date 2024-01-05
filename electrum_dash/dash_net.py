@@ -378,7 +378,7 @@ class DashNet(Logger):
         nDenom = dsq.nDenom
         if nDenom not in list(PSDenoms):
             return
-        dsq_hash = f'{nDenom}:{dsq.masternodeOutPoint}:{dsq.nTime}'
+        dsq_hash = f'{nDenom}:{dsq.protxHash}:{dsq.nTime}'
         if dsq_hash in self.recent_dsq_hashes:
             return
         self.recent_dsq_hashes.append(dsq_hash)
@@ -390,13 +390,13 @@ class DashNet(Logger):
         now = time.time()
         if now - dsq.nTime > PRIVATESEND_QUEUE_TIMEOUT:
             self.logger.info(f'is_suitable_dsq: to late to use'
-                             f' {dsq.masternodeOutPoint}')
+                             f' {dsq.protxHash}')
             return False
-        outpoint = str(dsq.masternodeOutPoint)
+        outpoint = str(dsq.protxHash)
         sml_entry = self.network.mn_list.get_mn_by_outpoint(outpoint)
         if not sml_entry:
             self.logger.info(f'is_suitable_dsq: dsq with unknown'
-                             f' outpoint {dsq.masternodeOutPoint}')
+                             f' outpoint {dsq.protxHash}')
             return False
         peer_str = f'{str_ip(sml_entry.ipAddress)}:{sml_entry.port}'
         if peer_str in recent_mixes_mns:

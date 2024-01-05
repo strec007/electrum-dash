@@ -71,7 +71,7 @@ class PSMixSession:
         self.state = None
         self.msg_id = None
         self.entries_count = 0
-        self.masternodeOutPoint = None
+        self.protxHash = None
         self.fReady = False
         self.nTime = 0
         self.start_time = time.time()
@@ -233,7 +233,7 @@ class PSMixSession:
             raise Exception('Get dsq with fReady not set')
         if self.fReady:
             raise Exception('Another dsq on session with fReady set')
-        self.masternodeOutPoint = dsq.masternodeOutPoint
+        self.protxHash = dsq.protxHash
         self.fReady = dsq.fReady
         self.nTime = dsq.nTime
 
