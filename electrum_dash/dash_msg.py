@@ -806,9 +806,9 @@ class DashGetMNListDMsg(DashMsgBase):
 class DashMNListDiffMsg(DashMsgBase):
     '''Class representing mnlistdiff message'''
 
-    fields = ('baseBlockHash blockHash totalTransactions merkleHashes'
+    fields = ('version baseBlockHash blockHash totalTransactions merkleHashes'
               ' merkleFlags cbTx deletedMNs mnList deletedQuorums'
-              ' newQuorums').split()
+              ' newQuorums quorumsCLSigs').split()
 
     def __init__(self, *args, **kwargs):
         super(DashMNListDiffMsg, self).__init__(*args, **kwargs)
@@ -838,6 +838,7 @@ class DashMNListDiffMsg(DashMsgBase):
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
+        version = vds.read_uint16()                     # version
         baseBlockHash = vds.read_bytes(32)              # baseBlockHash
         blockHash = vds.read_bytes(32)                  # blockHash
         totalTransactions = vds.read_uint32()           # totalTransactions
@@ -866,6 +867,8 @@ class DashMNListDiffMsg(DashMsgBase):
 
         deletedQuorums = []                             # deletedQuorums
         newQuorums = []                                 # newQuorums
+        quorumsCLSigs = []                              # newQuorums
+
         if vds.can_read_more():
             dq_cnt = vds.read_compact_size()            # deletedQuorums cnt
             for dq_i in range(dq_cnt):
@@ -873,11 +876,14 @@ class DashMNListDiffMsg(DashMsgBase):
             nq_cnt = vds.read_compact_size()            # newQuorums cnt
             for nq_i in range(nq_cnt):
                 newQuorums.append(DashQFCommitMsg.read_vds(vds))
+            qclsigs_cnt = vds.read_compact_size()            # newQuorums cnt
+            for qclsigs_i in range(qclsigs_cnt):
+                quorumsCLSigs.append(DashQuorumsCLSigObject.read_vds(vds))
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashMNListDiffMsg(baseBlockHash, blockHash, totalTransactions,
+        return DashMNListDiffMsg(version, baseBlockHash, blockHash, totalTransactions,
                                  merkleHashes, merkleFlags, cbTx, deletedMNs,
-                                 mnList, deletedQuorums, newQuorums)
+                                 mnList, deletedQuorums, newQuorums, quorumsCLSigs)
 
 
 class DashQFCommitMsg(DashMsgBase):
