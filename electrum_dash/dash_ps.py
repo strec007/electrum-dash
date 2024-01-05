@@ -519,6 +519,7 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
                     await asyncio.sleep(5)
                     continue
                 if not self.check_llmq_ready():
+                    self.logger.info('LLMQ height {0}, LLMQ tip {1}'
                     self.logger.info(_('New collateral workflow: {}')
                                      .format(self.LLMQ_DATA_NOT_READY))
                     await asyncio.sleep(5)
@@ -554,6 +555,8 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
                     await asyncio.sleep(5)
                     continue
                 if not self.check_llmq_ready():
+                    self.logger.info('LLMQ height {0}, LLMQ tip {1}'
+                                     .format(self.network.mn_list.llmq_height, self.network.mn_list.llmq_tip))
                     self.logger.info(_('New denoms workflow: {}')
                                      .format(self.LLMQ_DATA_NOT_READY))
                     await asyncio.sleep(5)
@@ -583,6 +586,8 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
                     and self.pay_collateral_wfl
                     and self.active_denominate_wfl_cnt < self.max_sessions):
                 if not self.check_llmq_ready():
+                    self.logger.info('LLMQ height {0}, LLMQ tip {1}'
+                                     .format(self.network.mn_list.llmq_height, self.network.mn_list.llmq_tip))
                     self.logger.info(_('Denominate workflow: {}')
                                      .format(self.LLMQ_DATA_NOT_READY))
                     await asyncio.sleep(5)
