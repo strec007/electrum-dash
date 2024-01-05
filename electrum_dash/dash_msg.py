@@ -959,6 +959,37 @@ class DashQFCommitMsg(DashMsgBase):
                                validMembers, quorumPublicKey,
                                quorumVvecHash, quorumSig, sig)
 
+class DashQuorumsCLSigObject(DashMsgBase):
+    '''Class representing quorumsCLSigsObject message'''
+
+    fields = ('blsSig indexSet').split()
+
+    def __init__(self, *args, **kwargs):
+        super(DashQuorumsCLSigObject, self).__init__(*args, **kwargs)
+
+    def __str__(self):
+        llmqType = (LLMQType(self.llmqType)
+                    if LLMQType.has_value(self.llmqType)
+                    else self.llmqType)
+        return ('DashQuorumsCLSigObject: blsSig: %s, indexSet: %s(%s),' %
+                (self.version, llmqType, self.llmqType,
+                 bh2u(self.quorumHash[::-1]), self.signersSize,
+                 bh2u(self.signers), self.validMembersSize,
+                 bh2u(self.validMembers), bh2u(self.quorumPublicKey),
+                 bh2u(self.quorumVvecHash[::-1]), bh2u(self.quorumSig),
+                 bh2u(self.sig)))
+
+    @classmethod
+    def read_vds(cls, vds, alone_data=False):
+        blsSig = vds.read_bytes(96)                     # BLS signature
+        indexSetCount = vds.read_compact_size()         # Quorum indexes
+        indexSet = []
+
+        for qi in range(indexSetCount):
+            indexSet.append(vds.read_uint16())
+
+        return DashQuorumsCLSigObject(blsSig, indexSet)
+
 
 class DashFliterLoadMsg(DashMsgBase):
     '''Class representing filterload message'''
