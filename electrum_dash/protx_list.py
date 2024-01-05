@@ -576,7 +576,7 @@ class MNList(Logger):
                                      f' tx_type={cbtx.tx_type}')
                     return False
                 cbtx_extra = cbtx.extra_payload
-                if cbtx_extra.version > 2:
+                if cbtx_extra.version > 3:
                     self.logger.info(f'on_mnlistdiff: unsupported CbTx'
                                      f' cbtx_extra.version='
                                      f'{cbtx_extra.version}')
