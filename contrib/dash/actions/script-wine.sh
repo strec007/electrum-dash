@@ -20,6 +20,7 @@ export WINEARCH=win64
 export WINEPREFIX=/root/.wine-64
 export PYHOME=$WINEPREFIX/drive_c/Python310
 
+ZBARW_PATH=https://github.com/Bertrand256/zbarw/releases/download/20180620
 ZBARW_FILE=zbarw-zbarcam-0.10-win64.zip
 ZBARW_SHA=7705dfd9a1c4b9d07c9ae11502dbe2dc305d08c884f0825b35d21b312316e162
 wget ${ZBARW_PATH}/${ZBARW_FILE}
