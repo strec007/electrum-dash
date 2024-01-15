@@ -387,16 +387,17 @@ class DashNet(Logger):
                          f' {len(self.recent_dsq)}')
 
     def is_suitable_dsq(self, dsq, recent_mixes_mns):
+        protxHash = bh2u(dsq.protxHash)
+
         now = time.time()
         if now - dsq.nTime > PRIVATESEND_QUEUE_TIMEOUT:
             self.logger.info(f'is_suitable_dsq: to late to use'
-                             f' {dsq.protxHash}')
+                             f' {protxHash}')
             return False
-        outpoint = str(dsq.protxHash)
-        sml_entry = self.network.mn_list.get_mn_by_outpoint(outpoint)
+        sml_entry = self.network.mn_list.get_mn_by_protx_hash(protxHash)
         if not sml_entry:
             self.logger.info(f'is_suitable_dsq: dsq with unknown'
-                             f' outpoint {dsq.protxHash}')
+                             f' proTxHash {protxHash}')
             return False
         peer_str = f'{str_ip(sml_entry.ipAddress)}:{sml_entry.port}'
         if peer_str in recent_mixes_mns:

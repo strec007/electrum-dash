@@ -448,10 +448,13 @@ class MNList(Logger):
         if valid:
             return random.choice(valid)
 
-    def get_mn_by_outpoint(self, outpoint):
-        protx_hash = self.mns_outpoints.get(outpoint)
-        if protx_hash:
-            return self.protx_mns.get(protx_hash)
+    def get_mn_by_protx_hash(self, protx_hash):
+        mn = [name for name, sml in self.protx_mns.items() if bh2u(sml.proRegTxHash) == protx_hash]
+
+        if len(mn) == 0:
+            return None
+
+        return self.protx_mns[mn[0]]
 
     def calc_responsible_quorum(self, llmqType, request_id):
         res = []

@@ -1200,7 +1200,7 @@ class DashDsqMsg(DashMsgBase):
     def __str__(self):
         return ('DashDsqMsg: nDenom: %s, protxHash: %s,'
                 ' nTime: %s, fReady: %s' %
-                (self.nDenom, self.protxHash,
+                (self.nDenom, bh2u(self.protxHash),
                  self.nTime, self.fReady))
 
     @classmethod

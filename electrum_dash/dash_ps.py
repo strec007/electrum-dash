@@ -24,7 +24,7 @@ from .dash_tx import PSTxTypes, SPEC_TX_NAMES, CTxIn
 from .logging import Logger
 from .transaction import Transaction, PartialTxOutput, PartialTransaction
 from .util import (NoDynamicFeeEstimates, log_exceptions, SilentTaskGroup,
-                   NotEnoughFunds, bfh, is_android)
+                   NotEnoughFunds, bfh, is_android, bh2u)
 from .i18n import _
 
 
@@ -594,6 +594,8 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
                     await asyncio.sleep(5)
                     continue
                 elif not self.check_protx_info_completeness():
+                    self.logger.info('Masternode ProTX Data completeness is {:0.2f}. 0.75 is required'
+                                     .format(self.network.mn_list.protx_info_completeness))
                     self.logger.info(_('Denominate workflow: {}')
                                      .format(self.MNS_DATA_NOT_READY))
                     await asyncio.sleep(5)
@@ -847,7 +849,7 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
         self.logger.wfl_done(f'Finished processing of pay collateral'
                              f' workflow: {wfl.lid}')
 
-    def get_pay_collateral_tx(self):
+    def  get_pay_collateral_tx(self):
         '''Get pay collateral tx prepared in pay_collateral_wfl'''
         wfl = self.pay_collateral_wfl
         if not wfl or not wfl.tx_order:
@@ -1664,7 +1666,7 @@ class PSManager(Logger, PSKeystoreMixin, PSDataMixin, PSOptsMixin,
                     dsq = self.dash_net.get_recent_dsq(recent_mns)
                     if dsq is not None:
                         self.logger.debug(f'get dsq from recent dsq queue'
-                                          f' {dsq.protxHash}')
+                                          f' {bh2u(dsq.protxHash)}')
                         dval = PS_DENOM_REVERSE_DICT[dsq.nDenom]
                         wfl = await self.loop.run_in_executor(None,
                                                               _start, dval)
