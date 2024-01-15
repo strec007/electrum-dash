@@ -2,15 +2,14 @@
 
 import asyncio
 import time
-from bls_py import bls
 from enum import IntEnum
+from blspy import BasicSchemeMPL, G1Element, G2Element
 
 from .bitcoin import address_to_script
 from .dash_msg import (DSPoolStatusUpdate, DSMessageIDs, ds_msg_str,
                        ds_pool_state_str, DashDsaMsg, DashDsiMsg, DashDssMsg)
 from .dash_tx import str_ip, CTxIn, CTxOut
-from .util import bfh
-
+from .util import bfh, bh2u
 
 PRIVATESEND_QUEUE_TIMEOUT = 30
 PRIVATESEND_SESSION_MSG_TIMEOUT = 40
@@ -50,8 +49,8 @@ class PSMixSession:
         self.sml_entry = None
 
         if dsq:
-            outpoint = str(dsq.masternodeOutPoint)
-            self.sml_entry = self.mn_list.get_mn_by_outpoint(outpoint)
+            protxHash = bh2u(dsq.protxHash)
+            self.sml_entry = self.mn_list.get_mn_by_protx_hash(protxHash)
         if not self.sml_entry:
             try_cnt = 0
             while True:
@@ -105,12 +104,13 @@ class PSMixSession:
         if not self.sml_entry:
             return False
         mn_pub_key = self.sml_entry.pubKeyOperator
-        pubk = bls.PublicKey.from_bytes(mn_pub_key)
-        sig = bls.Signature.from_bytes(ds_msg.vchSig)
-        msg_hash = ds_msg.msg_hash()
-        aggr_info = bls.AggregationInfo.from_msg_hash(pubk, msg_hash)
-        sig.set_aggregation_info(aggr_info)
-        return bls.BLS.verify(sig)
+        is_legacy = self.sml_entry.version == 1
+
+        pubkey = G1Element.from_bytes(mn_pub_key, is_legacy)
+        signature = G2Element.from_bytes(ds_msg.vchSig)
+
+        valid = BasicSchemeMPL.verify(pubkey, ds_msg.msg_hash(), signature)
+        return valid
 
     def verify_final_tx(self, tx, denominate_wfl):
         '''Verify final tx from dsf message'''
