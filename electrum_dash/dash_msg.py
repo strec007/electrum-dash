@@ -1118,7 +1118,7 @@ class DashDsaMsg(DashMsgBase):
 class DashDssuMsg(DashMsgBase):
     '''Class representing dssu message'''
 
-    fields = 'sessionID state entriesCount statusUpdate messageID'.split()
+    fields = 'sessionID state statusUpdate messageID'.split()
 
     def __init__(self, *args, **kwargs):
         super(DashDssuMsg, self).__init__(*args, **kwargs)
@@ -1134,28 +1134,25 @@ class DashDssuMsg(DashMsgBase):
                      if DSMessageIDs.has_value(self.messageID)
                      else self.messageID)
         return ('DashDssuMsg: sessionID: %s, state: %s,'
-                ' entriesCount: %s, statusUpdate: %s,'
+                ' statusUpdate: %s,'
                 ' messageID: %s' %
-                (self.sessionID, state,
-                 self.entriesCount, statusUpdate, messageID))
+                (self.sessionID, state, statusUpdate, messageID))
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
         sessionID = vds.read_int32()                    # sessionID
         state = vds.read_int32()                        # state
-        entriesCount = vds.read_int32()                 # entriesCount
         statusUpdate = vds.read_int32()                 # statusUpdate
         messageID = vds.read_int32()                    # messageID
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashDssuMsg(sessionID, state, entriesCount,
+        return DashDssuMsg(sessionID, state,
                            statusUpdate, messageID)
 
     def serialize(self):
         return (
             pack('<i', self.sessionID) +                # sessionID
             pack('<i', self.state) +                    # state
-            pack('<i', self.entriesCount) +             # entriesCount
             pack('<i', self.statusUpdate) +             # statusUpdate
             pack('<i', self.messageID)                  # messageID
         )
