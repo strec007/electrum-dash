@@ -204,15 +204,13 @@ class PSMixSession:
 
         self.state = dssu.state
         self.msg_id = dssu.messageID
-        self.entries_count = dssu.entriesCount
 
         state = ds_pool_state_str(self.state)
         msg = ds_msg_str(self.msg_id)
         if (dssu.statusUpdate == DSPoolStatusUpdate.ACCEPTED
                 and dssu.messageID != DSMessageIDs.ERR_QUEUE_FULL):
             self.logger.debug(f'{self.wfl_lid}: dssu read:'
-                              f' state={state}, msg={msg},'
-                              f' entries_count={self.entries_count}')
+                              f' state={state}, msg={msg}')
         elif dssu.statusUpdate == DSPoolStatusUpdate.ACCEPTED:
             raise Exception('MN queue is full')
         elif dssu.statusUpdate == DSPoolStatusUpdate.REJECTED:
