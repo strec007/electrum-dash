@@ -6,15 +6,9 @@ source contrib/build-wine/docker_env.sh
 mkdir -p dist
 
 BUILD_DIR=/root/build
-TOR_PROXY_VERSION=0.4.5.7
-TOR_PROXY_PATH=https://github.com/Bertrand256/tor-proxy/releases/download
+TOR_PROXY_VERSION=0.4.5.8
+TOR_PROXY_PATH=https://github.com/pshenmic/tor-proxy/releases/download
 TOR_DIST=dist/tor-proxy-setup.exe
-
-TOR_FILE=${TOR_PROXY_VERSION}/tor-proxy-${TOR_PROXY_VERSION}-win32-setup.exe
-wget -O ${TOR_DIST} ${TOR_PROXY_PATH}/${TOR_FILE}
-TOR_SHA=233ee2c8f4cbab6ffff74479156d91929564e7af8f9ff614e793f59fb51ac0f3
-echo "$TOR_SHA  $TOR_DIST" > sha256.txt
-shasum -a256 -s -c sha256.txt
 
 export WINEARCH=win64
 export WINEPREFIX=/root/.wine-64
@@ -31,7 +25,7 @@ unzip ${ZBARW_FILE} && rm ${ZBARW_FILE} sha256.txt
 rm ${TOR_DIST}
 TOR_FILE=${TOR_PROXY_VERSION}/tor-proxy-${TOR_PROXY_VERSION}-win64-setup.exe
 wget -O ${TOR_DIST} ${TOR_PROXY_PATH}/${TOR_FILE}
-TOR_SHA=514387e3b45eccd9b98e95450ea201ced49886cc4f0980d4f0f6f7a4a51aebe9
+TOR_SHA=62ee4604a788ceffb169c368efc9ccf751dce6ae5c2093858a42e814a1bd3c62
 echo "$TOR_SHA  $TOR_DIST" > sha256.txt
 shasum -a256 -s -c sha256.txt
 rm sha256.txt
