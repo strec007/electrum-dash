@@ -23,9 +23,6 @@ cp contrib/build-wine/deterministic.spec .
 cp contrib/dash/pyi_runtimehook.py .
 cp contrib/dash/pyi_tctl_runtimehook.py .
 
-wget https://download.lfd.uci.edu/pythonlibs/archived/cp36/multidict-5.1.0-cp36-cp36m-win_amd64.whl
-pip install ./multidict-5.1.0-cp36-cp36m-win_amd64.whl
-
 wine python -m pip install --no-dependencies --no-warn-script-location \
     -r contrib/deterministic-build/requirements.txt
 wine python -m pip install --no-dependencies --no-warn-script-location \
