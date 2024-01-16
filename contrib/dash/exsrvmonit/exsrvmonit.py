@@ -26,7 +26,10 @@ PID = str(os.getpid())
 MIN_PROTO_VERSION = '1.4'
 NUM_RECENT_DATA = 1440
 SERVERS_LIST = [
-    'dash-electrum.pshenmic.dev:50002'
+    'dash-electrum.pshenmic.dev:50002',
+    'electrum1.cipig.net:20061'
+    'electrum2.cipig.net:50002'
+    'electrum3.cipig.net:50002'
 ]
 
 
