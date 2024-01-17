@@ -67,6 +67,7 @@ break_legacy_easy_install
 
 
 info "Installing build dependencies."
+"$python" -m pip install git+https://github.com/pshenmic/bls-signatures.git
 "$python" -m pip install --no-dependencies --no-warn-script-location \
     --cache-dir "$PIP_CACHE_DIR" -r "$CONTRIB/deterministic-build/requirements-build-appimage.txt"
 
