@@ -213,14 +213,6 @@ jobs:
           DASH_ELECTRUM_VERSION: ${{ steps.set_vars.outputs.pkg_ver }}
         run: |
           ./contrib/dash/actions/script-wine.sh
-      - name: Upload Win32 Release Asset
-        uses: Bertrand256/upload-release-asset@v1.0.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag: ${{ inputs.tag }}
-          asset_path: dist/Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win32.exe
-          asset_name: Dash-Electrum-${{ steps.set_vars.outputs.pkg_ver }}-setup-win32.exe
       - name: Upload Win64 Release Asset
         uses: Bertrand256/upload-release-asset@v1.0.4
         env:

@@ -4,6 +4,21 @@
         "s": "50002",
         "version": "1.4"
     },
+    "electrum1.cipig.net": {
+        "pruning": "-",
+        "s": "20061",
+        "version": "1.4"
+    },
+    "electrum2.cipig.net": {
+        "pruning": "-",
+        "s": "20061",
+        "version": "1.4"
+    },
+    "electrum3.cipig.net": {
+        "pruning": "-",
+        "s": "20061",
+        "version": "1.4"
+    },
     "rnxogu42f3pq3e3oo7shqmh7mtema6c5fhhhsi54din4olzlu7vsx2id.onion": {
         "pruning": "-",
         "s": "50002",
