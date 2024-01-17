@@ -18,4 +18,5 @@ RUN apt-get update -y \
         libgmp-dev \
         git \
         cmake \
+        build-essential \
     && rm -rf /var/lib/apt/lists/*
