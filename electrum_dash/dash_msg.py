@@ -290,8 +290,8 @@ class DashSMLEntry(namedtuple('DashSMLEntry',
         res = (
            (pack('<H', self.version) if include_version else b'') + # version, only P2P field
             self.proRegTxHash +                         # proRegTxHash
-            self.confirmedHash +                           # confirmedHash
-            ipAddress +                                # ipAddress
+            self.confirmedHash +                        # confirmedHash
+            ipAddress +                                 # ipAddress
             pack('>H', self.port) +           # port
             self.pubKeyOperator +                       # pubKeyOperator
             self.keyIDVoting +                          # keyIDVoting
@@ -324,14 +324,14 @@ class DashSMLEntry(namedtuple('DashSMLEntry',
         port = read_uint16_nbo(vds)                     # port
         pubKeyOperator = vds.read_bytes(48)             # pubKeyOperator
         keyIDVoting = vds.read_bytes(20)                # keyIDVoting
-        isValid = vds.read_uchar()
+        isValid = vds.read_uchar()                      # isValid
 
         if version > 1:
-            nType = vds.read_int16()  # nType
+            nType = vds.read_int16()                    # nType
 
             if nType == 1:
-                platformHTTPPort = vds.read_uint16()  # port
-                platformNodeID = vds.read_bytes(20)  # proRegTxHash
+                platformHTTPPort = vds.read_uint16()    # platformHTTPPort
+                platformNodeID = vds.read_bytes(20)     # proRegTxHash
 
         # isValid
         if alone_data and vds.can_read_more():
@@ -471,19 +471,19 @@ class DashVersionMsg(DashMsgBase):
             pack('<Q', self.services) +                 # services
             pack('<I', self.timestamp) + b'\x00' * 4 +  # timestamp
             pack('<Q', self.recv_services) +            # recv_services
-            recv_ip +                                   # recv_ip
+            recv_ip +                                             # recv_ip
             pack('>H', self.recv_port) +                # recv_port
             pack('<Q', self.trans_services) +           # trans_services
-            trans_ip +                                  # trans_ip
+            trans_ip +                                            # trans_ip
             pack('>H', self.trans_port) +               # trans_port
             pack('<Q', self.nonce) +                    # nonce
-            user_agent_bytes +                          # user_agent
+            user_agent_bytes +                                    # user_agent
             pack('<i', self.start_height)               # start_height
         )
         if self.relay is not None:
             res += pack('B', self.relay)                # relay
         if self.mnauth_challenge is not None:
-            res += self.mnauth_challenge                # mnauth_challenge
+            res += self.mnauth_challenge                          # mnauth_challenge
         if self.fMasternode is not None:
             res += pack('B', self.fMasternode)          # fMasternode
         return res
@@ -539,7 +539,7 @@ class DashSendDsqMsg(DashMsgBase):
         return 'DashSendDsqMsg: fSendDSQueue: %s' % self.fSendDSQueue
 
     def serialize(self):
-        return pack('B', self.fSendDSQueue)             # fSendDSQueue
+        return pack('B', self.fSendDSQueue)   # fSendDSQueue
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
@@ -559,7 +559,7 @@ class DashPingMsg(DashMsgBase):
         return 'DashPingMsg: nonce: %s' % self.nonce
 
     def serialize(self):
-        return pack('<Q', self.nonce)                   # nonce
+        return pack('<Q', self.nonce)         # nonce
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
@@ -605,7 +605,7 @@ class DashAddrMsg(DashMsgBase):
             ip_addr = serialize_ip(a)
             res += pack('<I', a.timestamp)              # time
             res += pack('<Q', a.services)               # services
-            res += ip_addr                              # ip
+            res += ip_addr                                        # ip
             res += pack('>H', a.port)                   # port
         return res
 
@@ -648,7 +648,7 @@ class DashInvMsg(DashMsgBase):
             raise DashMsgError(f'{msg} msg: too long inventory to send')
         res = to_compact_size(inv_cnt)
         for i in self.inventory:
-            res += pack('<I', i.type)                   # type
+            res += pack('<I', i.type)         # type
             assert len(i.hash) == 32
             res += i.hash                               # hash
         return res
@@ -903,7 +903,7 @@ class DashMNListDiffMsg(DashMsgBase):
             nq_cnt = vds.read_compact_size()            # newQuorums cnt
             for nq_i in range(nq_cnt):
                 newQuorums.append(DashQFCommitMsg.read_vds(vds))
-            qclsigs_cnt = vds.read_compact_size()            # newQuorums cnt
+            qclsigs_cnt = vds.read_compact_size()       # newQuorums cnt
             for qclsigs_i in range(qclsigs_cnt):
                 quorumsCLSigs.append(DashQuorumsCLSigObject.read_vds(vds))
         if alone_data and vds.can_read_more():
@@ -947,8 +947,8 @@ class DashQFCommitMsg(DashMsgBase):
         assert len(self.quorumSig) == 96
         assert len(self.sig) == 96
         res = (
-            pack('<H', self.version) +                  # version
-            pack('B', self.llmqType) +                  # llmqType
+            pack('<H', self.version) +        # version
+            pack('B', self.llmqType) +        # llmqType
             self.quorumHash +                           # quorumHash
             (pack('<H', self.quorumIndex) if self.version == 2 or self.version == 4 else b'') +  # quorumIndex
             to_compact_size(self.signersSize) +         # signersSize
@@ -971,9 +971,9 @@ class DashQFCommitMsg(DashMsgBase):
 
         version = vds.read_uint16()                     # version
         llmqType = vds.read_uchar()                     # llmqType
-        quorumHash = vds.read_bytes(32)     # quorumHash
+        quorumHash = vds.read_bytes(32)                 # quorumHash
         if version == 2 or version == 4:
-            quorumIndex = vds.read_uint16()  # quorumHash
+            quorumIndex = vds.read_uint16()             # quorumHash
         signers_size = vds.read_compact_size()          # signersSize
         signers_bytes = (signers_size + 7) // 8
         signers = vds.read_bytes(signers_bytes)         # signers

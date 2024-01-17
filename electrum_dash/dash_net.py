@@ -95,8 +95,8 @@ class DashSporks:
         SporkID.SPORK_15_DETERMINISTIC_MNS_ENABLED.value: Y2099,    # OFF
         SporkID.SPORK_17_QUORUM_DKG_ENABLED.value: Y2099,           # OFF
         SporkID.SPORK_19_CHAINLOCKS_ENABLED.value: Y2099,           # OFF
-        SporkID.SPORK_21_QUORUM_ALL_CONNECTED.value: Y2099,  # OFF
-        SporkID.SPORK_23_QUORUM_POSE.value: Y2099,  # OFF
+        SporkID.SPORK_21_QUORUM_ALL_CONNECTED.value: Y2099,         # OFF
+        SporkID.SPORK_23_QUORUM_POSE.value: Y2099,                  # OFF
     }
 
 

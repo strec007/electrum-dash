@@ -134,7 +134,6 @@ def _configure_file_logging(log_directory: pathlib.Path):
     file_handler = logging.FileHandler(_logfile_path, encoding='utf-8')
     file_handler.setFormatter(file_formatter)
     file_handler.setLevel(logging.DEBUG)
-
     root_logger.addHandler(file_handler)
     if _inmemory_startup_logs:
         _inmemory_startup_logs.dump_to_target(file_handler)
@@ -243,14 +242,7 @@ class ShortcutFilteringFilter(logging.Filter):
 
 # enable logs universally (including for other libraries)
 root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)
-
-console_handle = logging.StreamHandler()
-console_handle.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(name)-20s - %(levelname)-8s - %(message)s")
-console_handle.setFormatter(formatter)
-
-root_logger.addHandler(console_handle)
+root_logger.setLevel(logging.WARNING)
 
 # Start collecting log messages now, into an in-memory buffer. This buffer is only
 # used until the proper log handlers are fully configured, including their verbosity,
@@ -281,7 +273,7 @@ def get_logger(name: str) -> logging.Logger:
 
 
 _logger = get_logger(__name__)
-_logger.setLevel(logging.DEBUG)
+_logger.setLevel(logging.INFO)
 
 
 class Logger:
