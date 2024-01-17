@@ -6,13 +6,7 @@ echo wine build version is $DASH_ELECTRUM_VERSION
 ./contrib/make_locale
 
 export ELECTRUM_COMMIT_HASH=$(git rev-parse HEAD)
-if [ "$WINEARCH" = "win32" ] ; then
-    export GCC_TRIPLET_HOST="i686-w64-mingw32"
-elif [ "$WINEARCH" = "win64" ] ; then
-    export GCC_TRIPLET_HOST="x86_64-w64-mingw32"
-else
-    fail "unexpected WINEARCH: $WINEARCH"
-fi
+export GCC_TRIPLET_HOST="x86_64-w64-mingw32"
 export host_strip="${GCC_TRIPLET_HOST}-strip"
 
 ./contrib/build-wine/build_secp256k1.sh
@@ -42,11 +36,7 @@ wine pyinstaller --clean -y \
     --name electrum-dash-$DASH_ELECTRUM_VERSION.exe \
     deterministic.spec
 
-if [[ $WINEARCH == win32 ]]; then
-    NSIS_EXE="$WINEPREFIX/drive_c/Program Files/NSIS/makensis.exe"
-else
-    NSIS_EXE="$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe"
-fi
+NSIS_EXE="$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe"
 
 wine "$NSIS_EXE" /NOCD -V3 \
     /DPRODUCT_VERSION=$DASH_ELECTRUM_VERSION \
