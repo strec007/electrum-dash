@@ -3,7 +3,7 @@
 import asyncio
 import time
 from enum import IntEnum
-from blspy import BasicSchemeMPL, G1Element, G2Element
+from .blspy_wrapper import BasicSchemeMPL, G1Element, G2Element
 
 from .bitcoin import address_to_script
 from .dash_msg import (DSPoolStatusUpdate, DSMessageIDs, ds_msg_str,
