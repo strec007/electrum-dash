@@ -36,7 +36,7 @@ echo "LDFLAGS = -no-undefined" >> Makefile.am
     --enable-shared || fail "Could not configure."
 make -j4 || fail "Could not build."
 make install || fail "Could not install."
-. "${PREFIX_DIR}/lib/libx11hash.la"
+. "${PREFIX_DIR}/lib/libdashbls.la"
 $host_strip "${PREFIX_DIR}/lib/$dlname"
 mkdir -p $DIST_DIR
 cp -fpv "${PREFIX_DIR}/lib/$dlname" $DIST_DIR || fail "Could not copy."
