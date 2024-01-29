@@ -9,7 +9,7 @@ WORKDIR /root
 RUN dpkg --add-architecture i386 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        wget git binutils-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 \
+        wget git binutils-mingw-w64 gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64-posix \
         win-iconv-mingw-w64-dev \
         build-essential libtool autoconf automake \
         gnupg2 \
@@ -19,7 +19,7 @@ RUN dpkg --add-architecture i386 \
     && wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key \
     && wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -sc)/winehq-$(lsb_release -sc).sources \
     && apt-get update \
-    && apt-get install -y wine-stable=8.0.2~jammy-1 \
+    && apt-get install -y wine-stable=9.0.0.0~jammy-1 \
         cabextract xauth xvfb ca-certificates zip unzip p7zip-full  \
     && wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
     && chmod +x winetricks && mv winetricks /usr/local/bin \

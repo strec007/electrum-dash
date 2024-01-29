@@ -11,6 +11,7 @@ export host_strip="${GCC_TRIPLET_HOST}-strip"
 
 ./contrib/build-wine/build_secp256k1.sh
 ./contrib/build-wine/build_x11_hash.sh
+./contrib/build-wine/build_bls_signatures.sh
 
 mv $BUILD_DIR/zbarw $WINEPREFIX/drive_c/
 

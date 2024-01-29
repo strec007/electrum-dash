@@ -267,7 +267,7 @@ class MNList(Logger):
             rlc['llmq_hashes'] = {}
             # Save values as hex strings
             for k, v in rl['protx_mns'].items():
-                rlc['protx_mns'][k] = v.serialize(as_hex=True)
+                rlc['protx_mns'][k] = v.serialize(as_hex=True, include_version=True)
             for k, v in rl['sml_hashes'].items():
                 rlc['sml_hashes'][k] = bh2u(v[::-1])
             for k, v in rl['quorums'].items():
@@ -448,10 +448,13 @@ class MNList(Logger):
         if valid:
             return random.choice(valid)
 
-    def get_mn_by_outpoint(self, outpoint):
-        protx_hash = self.mns_outpoints.get(outpoint)
-        if protx_hash:
-            return self.protx_mns.get(protx_hash)
+    def get_mn_by_protx_hash(self, protx_hash):
+        mn = [name for name, sml in self.protx_mns.items() if bh2u(sml.proRegTxHash) == protx_hash]
+
+        if len(mn) == 0:
+            return None
+
+        return self.protx_mns[mn[0]]
 
     def calc_responsible_quorum(self, llmqType, request_id):
         res = []
@@ -576,7 +579,7 @@ class MNList(Logger):
                                      f' tx_type={cbtx.tx_type}')
                     return False
                 cbtx_extra = cbtx.extra_payload
-                if cbtx_extra.version > 2:
+                if cbtx_extra.version > 3:
                     self.logger.info(f'on_mnlistdiff: unsupported CbTx'
                                      f' cbtx_extra.version='
                                      f'{cbtx_extra.version}')

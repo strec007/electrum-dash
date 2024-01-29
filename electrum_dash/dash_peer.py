@@ -46,7 +46,7 @@ from .version import ELECTRUM_VERSION
 
 
 EMPTY_PAYLOAD_CHECKSUM = b'\x5D\xF6\xE0\xE2'
-DASH_PROTO_VERSION = 70216
+DASH_PROTO_VERSION = 70230
 LOCAL_IP_ADDR = ipaddress.ip_address('127.0.0.1')
 PAYLOAD_LIMIT = 32*2**20  # 32MiB
 READ_LIMIT = 64*2**10     # 64KiB
@@ -173,7 +173,7 @@ class DashPeer(Logger):
         verack_received = False
         version_received = False
         await self.send_version()
-        for res in [await self.read_next_msg() for i in range(2)]:
+        for res in [await self.read_next_msg() for i in range(3)]:
             if not res:
                 continue
             if res.cmd == 'version':

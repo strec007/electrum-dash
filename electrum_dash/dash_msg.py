@@ -98,18 +98,15 @@ class DashType(IntEnumWithCheck):
 
 class SporkID(IntEnumWithCheck):
     '''Enum representing known Dash spork IDs'''
-    SPORK_2_INSTANTSEND_ENABLED = 10001
-    SPORK_3_INSTANTSEND_BLOCK_FILTERING = 10002
-    SPORK_5_INSTANTSEND_MAX_VALUE = 10004
-    SPORK_6_NEW_SIGS = 10005
-    SPORK_9_SUPERBLOCKS_ENABLED = 10008
-    SPORK_12_RECONSIDER_BLOCKS = 10011
+    SPORK_2_INSTANTSEND_ENABLED = 10001,
+    SPORK_3_INSTANTSEND_BLOCK_FILTERING = 10002,
+    SPORK_6_NEW_SIGS = 10005,
+    SPORK_9_SUPERBLOCKS_ENABLED = 10008,
     SPORK_15_DETERMINISTIC_MNS_ENABLED = 10014
-    SPORK_16_INSTANTSEND_AUTOLOCKS = 10015
-    SPORK_17_QUORUM_DKG_ENABLED = 10016
-    SPORK_19_CHAINLOCKS_ENABLED = 10018
-    SPORK_20_INSTANTSEND_LLMQ_BASED = 10019
-
+    SPORK_17_QUORUM_DKG_ENABLED = 10016,
+    SPORK_19_CHAINLOCKS_ENABLED = 10018,
+    SPORK_21_QUORUM_ALL_CONNECTED = 10020,
+    SPORK_23_QUORUM_POSE = 10022,
 
 class LLMQType(IntEnumWithCheck):
     '''Enum representing known LLMQ types'''
@@ -242,53 +239,66 @@ class DeletedQuorum(namedtuple('DeletedQuorum', 'llmqType quorumHash')):
 
 
 class DashSMLEntry(namedtuple('DashSMLEntry',
-                              'proRegTxHash confirmedHash ipAddress port'
-                              ' pubKeyOperator keyIDVoting isValid')):
+                              'version proRegTxHash confirmedHash ipAddress port'
+                              ' pubKeyOperator keyIDVoting isValid nType platformHTTPPort platformNodeID')):
     '''Class representing Simplified Masternode List entry'''
 
     def __str__(self):
-        return ('DashSMLEntry: proRegTxHash: %s, confirmedHash: %s,'
+        return ('DashSMLEntry: version %s, proRegTxHash: %s, confirmedHash: %s,'
                 ' ipAddress: %s, port: %s, pubKeyOperator: %s,'
-                ' keyIDVoting: %s, isValid: %s' %
-                (bh2u(self.proRegTxHash[::-1]), bh2u(self.confirmedHash[::-1]),
+                ' keyIDVoting: %s, isValid: %s nType %s platformHTTPPort %s platformNodeID %s' %
+                (self.version, bh2u(self.proRegTxHash[::-1]), bh2u(self.confirmedHash[::-1]),
                  str_ip(self.ipAddress), self.port, bh2u(self.pubKeyOperator),
-                 bh2u(self.keyIDVoting), self.isValid))
+                 bh2u(self.keyIDVoting), self.isValid, self.nType, self.platformHTTPPort, self.platformNodeID))
 
     def as_dict(self):
         return {
+            'version': self.version,
             'proRegTxHash': bh2u(self.proRegTxHash[::-1]),
             'confirmedHash': bh2u(self.confirmedHash[::-1]),
             'service': f'{str_ip(self.ipAddress)}:{self.port}',
             'pubKeyOperator': bh2u(self.pubKeyOperator),
             'votingAddress': hash160_to_p2pkh(self.keyIDVoting),
             'isValid': self.isValid,
+            'nType': self.nType,
+            'platformHTTPPort': self.platformHTTPPort,
+            'platformNodeID': bh2u(self.platformNodeID) if self.platformNodeID else None,
         }
 
     @classmethod
     def from_dict(cls, d):
+        version = d['version']
         proRegTxHash = bfh(d['proRegTxHash'])[::-1]
         confirmedHash = bfh(d['confirmedHash'])[::-1]
         ipAddress, port = service_to_ip_port(d['service'])
         pubKeyOperator = bfh(d['pubKeyOperator'])
         keyIDVoting = b58_address_to_hash160(d['votingAddress'])[1]
         isValid = d['isValid']
-        return DashSMLEntry(proRegTxHash, confirmedHash, ipAddress,
-                            port, pubKeyOperator, keyIDVoting, isValid)
+        nType = d['nType']
+        platformHTTPPort = d['platformHTTPPort']
+        platformNodeID = d['platformNodeID']
+        return DashSMLEntry(version, proRegTxHash, confirmedHash, ipAddress,
+                            port, pubKeyOperator, keyIDVoting, isValid, nType, platformHTTPPort, platformNodeID)
 
-    def serialize(self, as_hex=False):
+    def serialize(self, as_hex=False, include_version=False):
         assert len(self.proRegTxHash) == 32
         assert len(self.confirmedHash) == 32
         assert len(self.pubKeyOperator) == 48
         assert len(self.keyIDVoting) == 20
         ipAddress = serialize_ip(self.ipAddress)
+
         res = (
+           (pack('<H', self.version) if include_version else b'') + # version, only P2P field
             self.proRegTxHash +                         # proRegTxHash
             self.confirmedHash +                        # confirmedHash
             ipAddress +                                 # ipAddress
-            pack('>H', self.port) +                     # port
+            pack('>H', self.port) +           # port
             self.pubKeyOperator +                       # pubKeyOperator
             self.keyIDVoting +                          # keyIDVoting
-            pack('B', self.isValid)                     # isValid
+            pack('B', self.isValid) +         # isValid
+            (pack('<H', self.nType) if self.version > 1 else b'') +   # nType
+            (pack('<H', self.platformHTTPPort) if self.version > 1 and self.nType == 1 else b'') + # platformHTTPPort
+            (self.platformNodeID if self.version > 1 and self.nType == 1 else b'')  # platformNodeID
         )
         if as_hex:
             return bh2u(res)
@@ -303,6 +313,11 @@ class DashSMLEntry(namedtuple('DashSMLEntry',
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
+        nType = None
+        platformHTTPPort = None
+        platformNodeID = None
+
+        version = vds.read_int16()                      # version
         proRegTxHash = vds.read_bytes(32)               # proRegTxHash
         confirmedHash = vds.read_bytes(32)              # confirmedHash
         ipAddress = ip_address(vds.read_bytes(16))      # ipAddress
@@ -310,10 +325,19 @@ class DashSMLEntry(namedtuple('DashSMLEntry',
         pubKeyOperator = vds.read_bytes(48)             # pubKeyOperator
         keyIDVoting = vds.read_bytes(20)                # keyIDVoting
         isValid = vds.read_uchar()                      # isValid
+
+        if version > 1:
+            nType = vds.read_int16()                    # nType
+
+            if nType == 1:
+                platformHTTPPort = vds.read_uint16()    # platformHTTPPort
+                platformNodeID = vds.read_bytes(20)     # proRegTxHash
+
+        # isValid
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashSMLEntry(proRegTxHash, confirmedHash, ipAddress,
-                            port, pubKeyOperator, keyIDVoting, isValid)
+        return DashSMLEntry(version, proRegTxHash, confirmedHash, ipAddress,
+                            port, pubKeyOperator, keyIDVoting, isValid, nType, platformHTTPPort, platformNodeID)
 
 
 class DashInventory(namedtuple('DashInventory', 'type hash')):
@@ -447,19 +471,19 @@ class DashVersionMsg(DashMsgBase):
             pack('<Q', self.services) +                 # services
             pack('<I', self.timestamp) + b'\x00' * 4 +  # timestamp
             pack('<Q', self.recv_services) +            # recv_services
-            recv_ip +                                   # recv_ip
+            recv_ip +                                             # recv_ip
             pack('>H', self.recv_port) +                # recv_port
             pack('<Q', self.trans_services) +           # trans_services
-            trans_ip +                                  # trans_ip
+            trans_ip +                                            # trans_ip
             pack('>H', self.trans_port) +               # trans_port
             pack('<Q', self.nonce) +                    # nonce
-            user_agent_bytes +                          # user_agent
+            user_agent_bytes +                                    # user_agent
             pack('<i', self.start_height)               # start_height
         )
         if self.relay is not None:
             res += pack('B', self.relay)                # relay
         if self.mnauth_challenge is not None:
-            res += self.mnauth_challenge                # mnauth_challenge
+            res += self.mnauth_challenge                          # mnauth_challenge
         if self.fMasternode is not None:
             res += pack('B', self.fMasternode)          # fMasternode
         return res
@@ -515,7 +539,7 @@ class DashSendDsqMsg(DashMsgBase):
         return 'DashSendDsqMsg: fSendDSQueue: %s' % self.fSendDSQueue
 
     def serialize(self):
-        return pack('B', self.fSendDSQueue)             # fSendDSQueue
+        return pack('B', self.fSendDSQueue)   # fSendDSQueue
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
@@ -535,7 +559,7 @@ class DashPingMsg(DashMsgBase):
         return 'DashPingMsg: nonce: %s' % self.nonce
 
     def serialize(self):
-        return pack('<Q', self.nonce)                   # nonce
+        return pack('<Q', self.nonce)         # nonce
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
@@ -581,7 +605,7 @@ class DashAddrMsg(DashMsgBase):
             ip_addr = serialize_ip(a)
             res += pack('<I', a.timestamp)              # time
             res += pack('<Q', a.services)               # services
-            res += ip_addr                              # ip
+            res += ip_addr                                        # ip
             res += pack('>H', a.port)                   # port
         return res
 
@@ -624,7 +648,7 @@ class DashInvMsg(DashMsgBase):
             raise DashMsgError(f'{msg} msg: too long inventory to send')
         res = to_compact_size(inv_cnt)
         for i in self.inventory:
-            res += pack('<I', i.type)                   # type
+            res += pack('<I', i.type)         # type
             assert len(i.hash) == 32
             res += i.hash                               # hash
         return res
@@ -809,9 +833,9 @@ class DashGetMNListDMsg(DashMsgBase):
 class DashMNListDiffMsg(DashMsgBase):
     '''Class representing mnlistdiff message'''
 
-    fields = ('baseBlockHash blockHash totalTransactions merkleHashes'
+    fields = ('version baseBlockHash blockHash totalTransactions merkleHashes'
               ' merkleFlags cbTx deletedMNs mnList deletedQuorums'
-              ' newQuorums').split()
+              ' newQuorums quorumsCLSigs').split()
 
     def __init__(self, *args, **kwargs):
         super(DashMNListDiffMsg, self).__init__(*args, **kwargs)
@@ -841,6 +865,7 @@ class DashMNListDiffMsg(DashMsgBase):
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
+        version = vds.read_uint16()                     # version
         baseBlockHash = vds.read_bytes(32)              # baseBlockHash
         blockHash = vds.read_bytes(32)                  # blockHash
         totalTransactions = vds.read_uint32()           # totalTransactions
@@ -869,6 +894,8 @@ class DashMNListDiffMsg(DashMsgBase):
 
         deletedQuorums = []                             # deletedQuorums
         newQuorums = []                                 # newQuorums
+        quorumsCLSigs = []                              # newQuorums
+
         if vds.can_read_more():
             dq_cnt = vds.read_compact_size()            # deletedQuorums cnt
             for dq_i in range(dq_cnt):
@@ -876,17 +903,20 @@ class DashMNListDiffMsg(DashMsgBase):
             nq_cnt = vds.read_compact_size()            # newQuorums cnt
             for nq_i in range(nq_cnt):
                 newQuorums.append(DashQFCommitMsg.read_vds(vds))
+            qclsigs_cnt = vds.read_compact_size()       # newQuorums cnt
+            for qclsigs_i in range(qclsigs_cnt):
+                quorumsCLSigs.append(DashQuorumsCLSigObject.read_vds(vds))
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashMNListDiffMsg(baseBlockHash, blockHash, totalTransactions,
+        return DashMNListDiffMsg(version, baseBlockHash, blockHash, totalTransactions,
                                  merkleHashes, merkleFlags, cbTx, deletedMNs,
-                                 mnList, deletedQuorums, newQuorums)
+                                 mnList, deletedQuorums, newQuorums, quorumsCLSigs)
 
 
 class DashQFCommitMsg(DashMsgBase):
     '''Class representing qfcommit message'''
 
-    fields = ('version llmqType quorumHash signersSize signers'
+    fields = ('version llmqType quorumHash quorumIndex signersSize signers'
               ' validMembersSize validMembers quorumPublicKey quorumVvecHash'
               ' quorumSig sig').split()
 
@@ -917,9 +947,10 @@ class DashQFCommitMsg(DashMsgBase):
         assert len(self.quorumSig) == 96
         assert len(self.sig) == 96
         res = (
-            pack('<H', self.version) +                  # version
-            pack('B', self.llmqType) +                  # llmqType
+            pack('<H', self.version) +        # version
+            pack('B', self.llmqType) +        # llmqType
             self.quorumHash +                           # quorumHash
+            (pack('<H', self.quorumIndex) if self.version == 2 or self.version == 4 else b'') +  # quorumIndex
             to_compact_size(self.signersSize) +         # signersSize
             self.signers +                              # signers
             to_compact_size(self.validMembersSize) +    # validMembersSize
@@ -936,9 +967,13 @@ class DashQFCommitMsg(DashMsgBase):
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
+        quorumIndex = 0
+
         version = vds.read_uint16()                     # version
         llmqType = vds.read_uchar()                     # llmqType
         quorumHash = vds.read_bytes(32)                 # quorumHash
+        if version == 2 or version == 4:
+            quorumIndex = vds.read_uint16()             # quorumHash
         signers_size = vds.read_compact_size()          # signersSize
         signers_bytes = (signers_size + 7) // 8
         signers = vds.read_bytes(signers_bytes)         # signers
@@ -951,10 +986,41 @@ class DashQFCommitMsg(DashMsgBase):
         sig = vds.read_bytes(96)                        # sig
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashQFCommitMsg(version, llmqType, quorumHash,
+        return DashQFCommitMsg(version, llmqType, quorumHash, quorumIndex,
                                signers_size, signers, valid_m_size,
                                validMembers, quorumPublicKey,
                                quorumVvecHash, quorumSig, sig)
+
+class DashQuorumsCLSigObject(DashMsgBase):
+    '''Class representing quorumsCLSigsObject message'''
+
+    fields = ('blsSig indexSet').split()
+
+    def __init__(self, *args, **kwargs):
+        super(DashQuorumsCLSigObject, self).__init__(*args, **kwargs)
+
+    def __str__(self):
+        llmqType = (LLMQType(self.llmqType)
+                    if LLMQType.has_value(self.llmqType)
+                    else self.llmqType)
+        return ('DashQuorumsCLSigObject: blsSig: %s, indexSet: %s(%s),' %
+                (self.version, llmqType, self.llmqType,
+                 bh2u(self.quorumHash[::-1]), self.signersSize,
+                 bh2u(self.signers), self.validMembersSize,
+                 bh2u(self.validMembers), bh2u(self.quorumPublicKey),
+                 bh2u(self.quorumVvecHash[::-1]), bh2u(self.quorumSig),
+                 bh2u(self.sig)))
+
+    @classmethod
+    def read_vds(cls, vds, alone_data=False):
+        blsSig = vds.read_bytes(96)                     # BLS signature
+        indexSetCount = vds.read_compact_size()         # Quorum indexes
+        indexSet = []
+
+        for qi in range(indexSetCount):
+            indexSet.append(vds.read_uint16())
+
+        return DashQuorumsCLSigObject(blsSig, indexSet)
 
 
 class DashFliterLoadMsg(DashMsgBase):
@@ -1052,7 +1118,7 @@ class DashDsaMsg(DashMsgBase):
 class DashDssuMsg(DashMsgBase):
     '''Class representing dssu message'''
 
-    fields = 'sessionID state entriesCount statusUpdate messageID'.split()
+    fields = 'sessionID state statusUpdate messageID'.split()
 
     def __init__(self, *args, **kwargs):
         super(DashDssuMsg, self).__init__(*args, **kwargs)
@@ -1068,28 +1134,25 @@ class DashDssuMsg(DashMsgBase):
                      if DSMessageIDs.has_value(self.messageID)
                      else self.messageID)
         return ('DashDssuMsg: sessionID: %s, state: %s,'
-                ' entriesCount: %s, statusUpdate: %s,'
+                ' statusUpdate: %s,'
                 ' messageID: %s' %
-                (self.sessionID, state,
-                 self.entriesCount, statusUpdate, messageID))
+                (self.sessionID, state, statusUpdate, messageID))
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
         sessionID = vds.read_int32()                    # sessionID
         state = vds.read_int32()                        # state
-        entriesCount = vds.read_int32()                 # entriesCount
         statusUpdate = vds.read_int32()                 # statusUpdate
         messageID = vds.read_int32()                    # messageID
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashDssuMsg(sessionID, state, entriesCount,
+        return DashDssuMsg(sessionID, state,
                            statusUpdate, messageID)
 
     def serialize(self):
         return (
             pack('<i', self.sessionID) +                # sessionID
             pack('<i', self.state) +                    # state
-            pack('<i', self.entriesCount) +             # entriesCount
             pack('<i', self.statusUpdate) +             # statusUpdate
             pack('<i', self.messageID)                  # messageID
         )
@@ -1098,19 +1161,19 @@ class DashDssuMsg(DashMsgBase):
 class DashDstxMsg(DashMsgBase):
     '''Class representing dstx message'''
 
-    fields = 'tx masternodeOutPoint vchSig sigTime'.split()
+    fields = 'tx protxHash vchSig sigTime'.split()
 
     def __init__(self, *args, **kwargs):
         super(DashDstxMsg, self).__init__(*args, **kwargs)
 
     def __str__(self):
-        return ('DashDstxMsg: masternodeOutPoint: %s, sigTime: %s' %
-                (self.masternodeOutPoint, self.sigTime))
+        return ('DashDstxMsg: protxHash: %s, sigTime: %s' %
+                (self.protxHash, self.sigTime))
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
         tx = Transaction.read_vds(vds)                  # tx
-        masternodeOutPoint = TxOutPoint.read_vds(vds)   # masternodeOutPoint
+        protxHash = vds.read_bytes(32)   # protxHash
         vchSig_len = vds.read_compact_size()
         if vchSig_len != 96:
             raise DashMsgError(f'dsq msg: wrong vchSig length')
@@ -1118,32 +1181,32 @@ class DashDstxMsg(DashMsgBase):
         sigTime = vds.read_int64()                      # sigTime
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashDstxMsg(tx, masternodeOutPoint, vchSig, sigTime)
+        return DashDstxMsg(tx, protxHash, vchSig, sigTime)
 
     def msg_hash(self):
         return sha256d(bfh(self.tx.serialize()) +
-                       self.masternodeOutPoint.serialize() +
+                       self.protxHash +
                        pack('<q', self.sigTime))
 
 
 class DashDsqMsg(DashMsgBase):
     '''Class representing dsq message'''
 
-    fields = 'nDenom masternodeOutPoint nTime fReady vchSig'.split()
+    fields = 'nDenom protxHash nTime fReady vchSig'.split()
 
     def __init__(self, *args, **kwargs):
         super(DashDsqMsg, self).__init__(*args, **kwargs)
 
     def __str__(self):
-        return ('DashDsqMsg: nDenom: %s, masternodeOutPoint: %s,'
+        return ('DashDsqMsg: nDenom: %s, protxHash: %s,'
                 ' nTime: %s, fReady: %s' %
-                (self.nDenom, self.masternodeOutPoint,
+                (self.nDenom, bh2u(self.protxHash),
                  self.nTime, self.fReady))
 
     @classmethod
     def read_vds(cls, vds, alone_data=False):
         nDenom = vds.read_int32()                       # nDenom
-        masternodeOutPoint = TxOutPoint.read_vds(vds)   # masternodeOutPoint
+        protxHash = vds.read_bytes(32)                  # protx hash
         nTime = vds.read_int64()                        # nTime
         fReady = vds.read_uchar()                       # fReady
         vchSig_len = vds.read_compact_size()
@@ -1152,13 +1215,13 @@ class DashDsqMsg(DashMsgBase):
         vchSig = vds.read_bytes(96)                     # vchSig
         if alone_data and vds.can_read_more():
             raise SerializationError(f'{cls}: extra junk at the end')
-        return DashDsqMsg(nDenom, masternodeOutPoint, nTime,
+        return DashDsqMsg(nDenom, protxHash, nTime,
                           fReady, vchSig)
 
     def serialize(self):
         return (
             pack('<i', self.nDenom) +                   # nDenom
-            self.masternodeOutPoint.serialize() +       # masternodeOutPoint
+            self.protxHash +       # protx
             pack('<q', self.nTime) +                    # nTime
             pack('B', self.fReady) +                    # fReady
             to_compact_size(len(self.vchSig)) +         # vchSig
@@ -1167,7 +1230,7 @@ class DashDsqMsg(DashMsgBase):
 
     def msg_hash(self):
         return sha256d(pack('<i', self.nDenom) +
-                       self.masternodeOutPoint.serialize() +
+                       self.protxHash +
                        pack('<q', self.nTime) +
                        pack('B', self.fReady))
 

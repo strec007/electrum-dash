@@ -91,16 +91,14 @@ class DashSporks:
     SPORKS_DEFAULTS = {
         SporkID.SPORK_2_INSTANTSEND_ENABLED.value: 0,               # ON
         SporkID.SPORK_3_INSTANTSEND_BLOCK_FILTERING.value: 0,       # ON
-        SporkID.SPORK_5_INSTANTSEND_MAX_VALUE.value: 1000,          # 1000 Dash
-        SporkID.SPORK_6_NEW_SIGS.value: Y2099,                      # OFF
         SporkID.SPORK_9_SUPERBLOCKS_ENABLED.value: Y2099,           # OFF
-        SporkID.SPORK_12_RECONSIDER_BLOCKS.value: 0,                # 0 Blocks
         SporkID.SPORK_15_DETERMINISTIC_MNS_ENABLED.value: Y2099,    # OFF
-        SporkID.SPORK_16_INSTANTSEND_AUTOLOCKS.value: Y2099,        # OFF
         SporkID.SPORK_17_QUORUM_DKG_ENABLED.value: Y2099,           # OFF
         SporkID.SPORK_19_CHAINLOCKS_ENABLED.value: Y2099,           # OFF
-        SporkID.SPORK_20_INSTANTSEND_LLMQ_BASED.value: Y2099,       # OFF
+        SporkID.SPORK_21_QUORUM_ALL_CONNECTED.value: Y2099,         # OFF
+        SporkID.SPORK_23_QUORUM_POSE.value: Y2099,                  # OFF
     }
+
 
     def __init__(self):
         self.from_peers = set()
@@ -380,7 +378,7 @@ class DashNet(Logger):
         nDenom = dsq.nDenom
         if nDenom not in list(PSDenoms):
             return
-        dsq_hash = f'{nDenom}:{dsq.masternodeOutPoint}:{dsq.nTime}'
+        dsq_hash = f'{nDenom}:{dsq.protxHash}:{dsq.nTime}'
         if dsq_hash in self.recent_dsq_hashes:
             return
         self.recent_dsq_hashes.append(dsq_hash)
@@ -389,16 +387,17 @@ class DashNet(Logger):
                          f' {len(self.recent_dsq)}')
 
     def is_suitable_dsq(self, dsq, recent_mixes_mns):
+        protxHash = bh2u(dsq.protxHash)
+
         now = time.time()
         if now - dsq.nTime > PRIVATESEND_QUEUE_TIMEOUT:
             self.logger.info(f'is_suitable_dsq: to late to use'
-                             f' {dsq.masternodeOutPoint}')
+                             f' {protxHash}')
             return False
-        outpoint = str(dsq.masternodeOutPoint)
-        sml_entry = self.network.mn_list.get_mn_by_outpoint(outpoint)
+        sml_entry = self.network.mn_list.get_mn_by_protx_hash(protxHash)
         if not sml_entry:
             self.logger.info(f'is_suitable_dsq: dsq with unknown'
-                             f' outpoint {dsq.masternodeOutPoint}')
+                             f' proTxHash {protxHash}')
             return False
         peer_str = f'{str_ip(sml_entry.ipAddress)}:{sml_entry.port}'
         if peer_str in recent_mixes_mns:

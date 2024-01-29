@@ -12,6 +12,8 @@ RUN apt-get update -q && \
         git \
         wget \
         make \
+        cmake \
+        build-essential \
         autotools-dev \
         autoconf \
         libtool \

@@ -17,4 +17,6 @@ RUN apt-get update -y \
         python3-requests \
         libgmp-dev \
         git \
+        cmake \
+        build-essential \
     && rm -rf /var/lib/apt/lists/*
